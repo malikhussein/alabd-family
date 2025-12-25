@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInput } from '@/lib/validation/auth';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
+import { Button } from '../../components/ui/button';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -62,9 +63,9 @@ export default function LoginPage() {
           )}
         </div>
 
-        <button disabled={isSubmitting} type="submit">
+        <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </button>
+        </Button>
 
         {serverError && <p style={{ color: 'crimson' }}>{serverError}</p>}
       </form>
