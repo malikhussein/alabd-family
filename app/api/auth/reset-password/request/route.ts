@@ -7,13 +7,23 @@ import {
 } from '../../../../../entities/auth-code.entity';
 import { generateCode, generateExpiry } from '../../../../../lib/codes';
 import { sendMail } from '../../../../../lib/mailer';
+import { requestResetPasswordSchema } from '../../../../../lib/validation/auth';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
 
-  const email = body?.email?.toString().toLowerCase();
-  if (!email)
-    return NextResponse.json({ message: 'Email is required' }, { status: 400 });
+  const parsed = requestResetPasswordSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        message: 'Validation error',
+        errors: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 }
+    );
+  }
+
+  const email = parsed.data.email;
 
   const db = await getDb();
   const userRepo = db.getRepository(User);

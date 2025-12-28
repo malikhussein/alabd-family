@@ -3,18 +3,24 @@ import { User } from '../../../../entities/user.entity';
 import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
 import { getDb } from '../../../../lib/db';
 import bcrypt from 'bcrypt';
+import { resetPasswordSchema } from '../../../../lib/validation/auth';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
 
-  const code = body?.code?.toString();
-  const password = body?.password?.toString();
-
-  if (!code || !password)
+  const parsed = resetPasswordSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { message: 'Code and password are required' },
+      {
+        message: 'Validation error',
+        errors: parsed.error.flatten().fieldErrors,
+      },
       { status: 400 }
     );
+  }
+
+  const code = parsed.data.code;
+  const password = parsed.data.password;
 
   const db = await getDb();
   const codeRepo = db.getRepository(AuthCode);

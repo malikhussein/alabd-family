@@ -2,13 +2,22 @@ import { NextResponse } from 'next/server';
 import { getDb } from '../../../../lib/db';
 import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
 import { User } from '../../../../entities/user.entity';
+import { verifyEmailSchema } from '../../../../lib/validation/auth';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
-  const code = body?.code?.toString();
+  const parsed = verifyEmailSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        message: 'Validation error',
+        errors: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 }
+    );
+  }
 
-  if (!code)
-    return NextResponse.json({ message: 'Code is required' }, { status: 400 });
+  const code = parsed.data.code;
 
   const db = await getDb();
   const codeRepo = db.getRepository(AuthCode);
