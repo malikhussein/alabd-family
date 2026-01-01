@@ -21,14 +21,14 @@ export async function GET(
     );
   }
 
-  // if (!isAdmin(session)) {
-  //   return NextResponse.json(
-  //     { message: 'Forbidden' },
-  //     {
-  //       status: 403,
-  //     }
-  //   );
-  // }
+  if (!isAdmin(session)) {
+    return NextResponse.json(
+      { message: 'Forbidden' },
+      {
+        status: 403,
+      }
+    );
+  }
 
   const { id } = await params;
   const userId = Number(id);
