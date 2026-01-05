@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { AuthCode } from '../entities/auth-code.entity';
 import { Post } from '../entities/post.entity';
+import { Like } from '../entities/like.entity';
 
 const globalForDataSource = globalThis as unknown as {
   appDataSource?: DataSource;
@@ -13,7 +14,7 @@ export const AppDataSource =
   new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    entities: [User, AuthCode, Post],
+    entities: [User, AuthCode, Post, Like],
     synchronize: true, // use migrations later
     logging: true,
   });
