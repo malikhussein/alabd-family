@@ -16,18 +16,18 @@ import { User } from './user.entity';
 @Index('IDX_like_user', ['userId'])
 @Entity('likes')
 export class Like {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn({ primaryKeyConstraintName: 'PK_LIKE_ID' })
   id!: string;
 
-  @Column({ type: 'uuid' })
-  postId!: string;
+  @Column()
+  postId!: number;
 
   @ManyToOne(() => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   post!: Post;
 
-  @Column({ type: 'uuid' })
-  userId!: string;
+  @Column()
+  userId!: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
