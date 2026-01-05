@@ -49,3 +49,30 @@ export async function PUT(
 
   return NextResponse.json({ ok: true, liked: true });
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await requireSession();
+  if (!session?.user?.email)
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+  const postId = Number(id);
+
+  const db = await getDb();
+  const postRepo = db.getRepository(Post);
+  const likeRepo = db.getRepository(Like);
+  const me = await getMe(db, session.user.email);
+  if (!me)
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  const post = await postRepo.findOne({ where: { id: postId } });
+  if (!post)
+    return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+
+  await likeRepo.delete({ postId: post.id, userId: me.id });
+
+  return NextResponse.json({ ok: true, liked: false });
+}
