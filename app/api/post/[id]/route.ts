@@ -79,12 +79,12 @@ export async function PATCH(
   }
 
   // Can the moderator edit approved posts?
-  // if (!isAdmin(session) && post.status === PostStatus.APPROVED) {
-  //   return NextResponse.json(
-  //     { message: 'Cannot edit approved post' },
-  //     { status: 403 }
-  //   );
-  // }
+  if (!isAdmin(session) && post.status === PostStatus.APPROVED) {
+    return NextResponse.json(
+      { message: 'Cannot edit approved post' },
+      { status: 403 }
+    );
+  }
 
   const { text, imageUrl } = parsed.data;
 
@@ -131,12 +131,12 @@ export async function DELETE(
   }
 
   // Can the moderator delete approved posts?
-  // if (post.status === PostStatus.APPROVED && !isAdmin(session)) {
-  //   return NextResponse.json(
-  //     { message: 'Cannot delete approved post' },
-  //     { status: 403 }
-  //   );
-  // }
+  if (post.status === PostStatus.APPROVED && !isAdmin(session)) {
+    return NextResponse.json(
+      { message: 'Cannot delete approved post' },
+      { status: 403 }
+    );
+  }
 
   await repo.softDelete({ id: postId });
 
