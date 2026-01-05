@@ -100,3 +100,45 @@ export async function PATCH(
 
   return NextResponse.json({ ok: true, post });
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await requireSession();
+  if (!session?.user?.email)
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+  const postId = Number(id);
+
+  const db = await getDb();
+  const repo = db.getRepository(Post);
+
+  const post = await repo.findOne({
+    where: { id: postId },
+    relations: { author: true },
+  });
+
+  if (!post)
+    return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+
+  const isOwner =
+    post.author?.email?.toLowerCase() === session.user.email.toLowerCase();
+
+  if (!isAdmin(session) && !isOwner) {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  }
+
+  // Can the moderator delete approved posts?
+  // if (post.status === PostStatus.APPROVED && !isAdmin(session)) {
+  //   return NextResponse.json(
+  //     { message: 'Cannot delete approved post' },
+  //     { status: 403 }
+  //   );
+  // }
+
+  await repo.softDelete({ id: postId });
+
+  return NextResponse.json({ ok: true });
+}
