@@ -3,38 +3,81 @@ import { Post, PostStatus } from '../../../../entities/post.entity';
 import { getDb } from '../../../../lib/db';
 import { isAdmin, requireSession } from '../../../../lib/helpers/auth.helper';
 import { updatePostSchema } from '../../../../lib/validation/post';
+import { Like } from '../../../../entities/like.entity';
+import { User } from '../../../../entities/user.entity';
 
 export async function GET(
   _req: Request,
   { params }: { params: { id: string } }
 ) {
   const db = await getDb();
-  const repo = db.getRepository(Post);
+  const postRepo = db.getRepository(Post);
+  const likeRepo = db.getRepository(Like);
+  const userRepo = db.getRepository(User);
 
   const { id } = await params;
   const postId = Number(id);
 
-  const post = await repo.findOne({
+  if (!Number.isFinite(postId)) {
+    return NextResponse.json({ message: 'Invalid post id' }, { status: 400 });
+  }
+
+  const post = await postRepo.findOne({
     where: { id: postId },
     relations: { author: true },
   });
 
-  if (!post)
+  if (!post) {
     return NextResponse.json({ message: 'Post not found' }, { status: 404 });
-
-  if (post.status === PostStatus.APPROVED) {
-    return NextResponse.json({ post });
   }
 
+  // If not approved -> only admin/owner can see it
+  if (post.status !== PostStatus.APPROVED) {
+    const session = await requireSession();
+    if (!session?.user?.email) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const owner =
+      post.author?.email?.toLowerCase() === session.user.email.toLowerCase();
+
+    if (!isAdmin(session) && !owner) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+  }
+
+  // likesCount (1 query)
+  const likesCount = await likeRepo.count({ where: { postId } });
+
+  // likedByMe (0-2 queries, only if logged in)
   const session = await requireSession();
-  if (!session?.user?.email)
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  let likedByMe = false;
 
-  const owner =
-    post.author?.email?.toLowerCase() === session.user.email.toLowerCase();
-  if (isAdmin(session) || owner) return NextResponse.json(post);
+  const email = session?.user?.email?.toLowerCase();
+  if (email) {
+    const me = await userRepo.findOne({
+      where: { email },
+      select: { id: true },
+    });
 
-  return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    if (me) {
+      // If your Like.userId type matches me.id type, this works
+      const existing = await likeRepo.findOne({
+        where: { postId, userId: me.id as any },
+        select: { id: true },
+      });
+
+      likedByMe = !!existing;
+    }
+  }
+
+  return NextResponse.json({
+    post: {
+      ...post,
+      likesCount,
+      likedByMe,
+    },
+  });
 }
 
 export async function PATCH(
