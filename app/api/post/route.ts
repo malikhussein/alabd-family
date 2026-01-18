@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const page = Math.max(1, Number(searchParams.get('page') || '1'));
   const limit = Math.min(
     100,
-    Math.max(1, Number(searchParams.get('limit') || '10'))
+    Math.max(1, Number(searchParams.get('limit') || '10')),
   );
   const skip = (page - 1) * limit;
 
@@ -48,15 +48,15 @@ export async function GET(req: Request) {
         .getRawMany()
     : [];
 
-  const likesCountMap = new Map<string, number>(
+  const likesCountMap = new Map<number, number>(
     rawCounts.map((r: { postId: string; count: string }) => [
-      r.postId,
+      Number(r.postId),
       Number(r.count),
-    ])
+    ]),
   );
 
   // likedByMe for page posts (1 query)
-  let likedSet = new Set<string>();
+  let likedSet = new Set<number>();
   if (email && postIds.length) {
     const me = await userRepo.findOne({
       where: { email },
@@ -71,8 +71,8 @@ export async function GET(req: Request) {
         .andWhere(`l."postId" IN (:...ids)`, { ids: postIds })
         .getRawMany();
 
-      likedSet = new Set<string>(
-        myLikes.map((r: { postId: string }) => r.postId)
+      likedSet = new Set<number>(
+        myLikes.map((r: { postId: string }) => Number(r.postId)),
       );
     }
   }
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
         message: 'Validation input',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

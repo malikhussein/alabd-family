@@ -15,7 +15,7 @@ async function getMe(db: DataSource, email: string) {
 
 export async function PUT(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)
@@ -37,7 +37,7 @@ export async function PUT(
   if (post.status !== PostStatus.APPROVED)
     return NextResponse.json(
       { message: 'You can only like approved posts' },
-      { status: 400 }
+      { status: 400 },
     );
 
   try {
@@ -52,7 +52,7 @@ export async function PUT(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)

@@ -9,7 +9,7 @@ import { User, UserRole } from '../../../../../entities/user.entity';
 
 export async function PATCH(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)
@@ -31,7 +31,7 @@ export async function PATCH(
   if (target.email.toLowerCase() === session.user.email.toLowerCase()) {
     return NextResponse.json(
       { message: 'You cannot change your own role' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -39,7 +39,7 @@ export async function PATCH(
   if (target.role === UserRole.ADMIN) {
     return NextResponse.json(
       { message: 'Cannot change ADMIN role' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

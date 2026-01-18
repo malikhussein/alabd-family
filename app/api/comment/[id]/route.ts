@@ -6,7 +6,7 @@ import { Comment } from '../../../../entities/comment.entity';
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email) {
@@ -14,7 +14,7 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const commentId = Number(id);
+  const commentId = id;
 
   const db = await getDb();
   const commentRepo = db.getRepository(Comment);

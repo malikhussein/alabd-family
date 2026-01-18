@@ -8,7 +8,7 @@ import { User } from '../../../../entities/user.entity';
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const db = await getDb();
   const postRepo = db.getRepository(Post);
@@ -82,7 +82,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)
@@ -96,7 +96,7 @@ export async function PATCH(
         message: 'Validation error',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -125,7 +125,7 @@ export async function PATCH(
   if (!isAdmin(session) && post.status === PostStatus.APPROVED) {
     return NextResponse.json(
       { message: 'Cannot edit approved post' },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -146,7 +146,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)
@@ -177,7 +177,7 @@ export async function DELETE(
   if (post.status === PostStatus.APPROVED && !isAdmin(session)) {
     return NextResponse.json(
       { message: 'Cannot delete approved post' },
-      { status: 403 }
+      { status: 403 },
     );
   }
 

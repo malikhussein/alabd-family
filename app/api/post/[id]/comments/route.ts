@@ -11,7 +11,7 @@ import { User } from '../../../../../entities/user.entity';
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email) {
@@ -34,7 +34,7 @@ export async function POST(
   if (post.status !== PostStatus.APPROVED)
     return NextResponse.json(
       { message: 'You can only comment on approved posts' },
-      { status: 400 }
+      { status: 400 },
     );
 
   const body = await req.json().catch(() => null);
@@ -45,7 +45,7 @@ export async function POST(
         message: 'Validation input',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -66,13 +66,13 @@ export async function POST(
 
   return NextResponse.json(
     { ok: true, commentId: comment.id },
-    { status: 201 }
+    { status: 201 },
   );
 }
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const postId = Number(id);

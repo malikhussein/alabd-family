@@ -8,7 +8,7 @@ import { Post, PostStatus } from '../../../../../entities/post.entity';
 
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
   if (!session?.user?.email)
