@@ -1,28 +1,26 @@
-# Stage 1: Dependencies
+# ---------- deps ----------
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Needed by some native deps (bcrypt, sharp, etc.)
+RUN apk add --no-cache libc6-compat
 
-# Install dependencies
-RUN npm ci --legacy-peer-deps
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Stage 2: Builder
+# ---------- builder ----------
 FROM node:20-alpine AS builder
 WORKDIR /app
+RUN apk add --no-cache libc6-compat
 
-# Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set environment variable for build
+# If you want smallest runtime image, enable standalone output (see next.config below)
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Build the application
 RUN npm run build
 
-# Stage 3: Runner (Production)
+# ---------- runner ----------
 FROM node:20-alpine AS runner
 WORKDIR /app
 
@@ -30,25 +28,18 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
+# If you use standalone output (recommended):
+# - copy standalone server
+# - copy static and public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
-# Set correct permissions
-RUN chown -R nextjs:nodejs /app
-
-# Switch to non-root user
 USER nextjs
 
-# Expose port
 EXPOSE 3000
-
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-# Start the application
 CMD ["node", "server.js"]
