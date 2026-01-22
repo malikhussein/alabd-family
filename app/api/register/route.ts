@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 import { getDb } from '@/lib/db';
 import { signupSchema } from '@/lib/validation/auth';
 import { User, UserRole } from '@/entities/user.entity';
-import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
-import { generateCode, generateExpiry } from '../../../../lib/codes';
-import { sendMail } from '../../../../lib/mailer';
+import { AuthCode, AuthCodeType } from '../../../entities/auth-code.entity';
+import { generateCode, generateExpiry } from '../../../lib/codes';
+import { sendMail } from '../../../lib/mailer';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         message: 'Validation error',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   if (existing) {
     return NextResponse.json(
       { message: 'Email already in use' },
-      { status: 409 }
+      { status: 409 },
     );
   }
 

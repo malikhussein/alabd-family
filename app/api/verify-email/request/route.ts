@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
-import { auth } from '../../../../../auth';
-import {
-  AuthCode,
-  AuthCodeType,
-} from '../../../../../entities/auth-code.entity';
-import { generateCode, generateExpiry } from '../../../../../lib/codes';
-import { getDb } from '../../../../../lib/db';
-import { sendMail } from '../../../../../lib/mailer';
+import { auth } from '../../../../auth';
+import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
+import { generateCode, generateExpiry } from '../../../../lib/codes';
+import { getDb } from '../../../../lib/db';
+import { sendMail } from '../../../../lib/mailer';
 
 export async function POST() {
   const session = await auth();

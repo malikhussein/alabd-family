@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { changePasswordSchema } from '../../../../lib/validation/auth';
-import { auth } from '../../../../auth';
-import { getDb } from '../../../../lib/db';
-import { User } from '../../../../entities/user.entity';
+import { changePasswordSchema } from '../../../lib/validation/auth';
+import { auth } from '../../../auth';
+import { getDb } from '../../../lib/db';
+import { User } from '../../../entities/user.entity';
 import bcrypt from 'bcrypt';
 
 export async function POST(req: Request) {
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         message: 'Validation error',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   if (!isMatch) {
     return NextResponse.json(
       { message: 'Current password is incorrect' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
