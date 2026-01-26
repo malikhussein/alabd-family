@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
-import { User } from '../../../../../entities/user.entity';
-import { getDb } from '../../../../../lib/db';
-import {
-  AuthCode,
-  AuthCodeType,
-} from '../../../../../entities/auth-code.entity';
-import { generateCode, generateExpiry } from '../../../../../lib/codes';
-import { sendMail } from '../../../../../lib/mailer';
-import { requestResetPasswordSchema } from '../../../../../lib/validation/auth';
+import { User } from '../../../../entities/user.entity';
+import { getDb } from '../../../../lib/db';
+import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
+import { generateCode, generateExpiry } from '../../../../lib/codes';
+import { sendMail } from '../../../../lib/mailer';
+import { requestResetPasswordSchema } from '../../../../lib/validation/auth';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -19,7 +16,7 @@ export async function POST(req: Request) {
         message: 'Validation error',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -35,7 +32,7 @@ export async function POST(req: Request) {
       {
         message: 'Check your email for password reset instructions',
       },
-      { status: 200 }
+      { status: 200 },
     );
 
   await codeRepo.delete({

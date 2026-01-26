@@ -1,30 +1,33 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '../../../../lib/db';
-import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
-import { User } from '../../../../entities/user.entity';
-import { verifyEmailSchema } from '../../../../lib/validation/auth';
+import { User } from '../../../entities/user.entity';
+import { AuthCode, AuthCodeType } from '../../../entities/auth-code.entity';
+import { getDb } from '../../../lib/db';
+import bcrypt from 'bcrypt';
+import { resetPasswordSchema } from '../../../lib/validation/auth';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
-  const parsed = verifyEmailSchema.safeParse(body);
+
+  const parsed = resetPasswordSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       {
         message: 'Validation error',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const code = parsed.data.code;
+  const password = parsed.data.password;
 
   const db = await getDb();
   const codeRepo = db.getRepository(AuthCode);
   const userRepo = db.getRepository(User);
 
   const authCode = await codeRepo.findOne({
-    where: { code, type: AuthCodeType.VERIFY_EMAIL },
+    where: { code, type: AuthCodeType.RESET_PASSWORD },
   });
 
   if (!authCode)
@@ -41,10 +44,9 @@ export async function POST(req: Request) {
   if (!user)
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
-  if (!user.emailVerifiedAt) {
-    user.emailVerifiedAt = new Date();
-    await userRepo.save(user);
-  }
+  const passwordHash = await bcrypt.hash(password, 12);
+  user.password = passwordHash;
+  await userRepo.save(user);
 
   authCode.usedAt = new Date();
   await codeRepo.save(authCode);
