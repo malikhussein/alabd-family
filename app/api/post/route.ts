@@ -6,9 +6,9 @@ import {
   isModerator,
   requireSession,
 } from '../../../lib/helpers/auth.helper';
-import { createPostSchema } from '../../../lib/validation/post';
-import { User, UserRole } from '../../../entities/user.entity';
+import { User } from '../../../entities/user.entity';
 import { Like } from '../../../entities/like.entity';
+import { uploadImageToS3 } from '../../../lib/upload-image';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -106,17 +106,13 @@ export async function POST(req: Request) {
   if (!isAdmin(session) && !isModerator(session))
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
-  const body = await req.json().catch(() => null);
-  const parsed = createPostSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        message: 'Validation input',
-        errors: parsed.error.flatten().fieldErrors,
-      },
-      { status: 400 },
-    );
+  const form = await req.formData();
+  const text = form.get('text');
+  if (typeof text !== 'string' || text.trim().length === 0) {
+    return NextResponse.json({ message: 'Text is required' }, { status: 400 });
   }
+
+  const file = form.get('file');
 
   const db = await getDb();
   const userRepo = db.getRepository(User);
@@ -127,17 +123,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
   }
 
-  const admin = me.role === UserRole.ADMIN;
+  const userKey = session.user.id ?? session.user.email ?? 'user';
+
+  // Optional image upload
+  let imageKey: string | null = null;
+  let imageUrl: string | null = null;
+
+  if (file instanceof File) {
+    const uploaded = await uploadImageToS3({
+      file,
+      kind: 'post',
+      userKey,
+    });
+    imageKey = uploaded.key;
+    imageUrl = uploaded.publicUrl;
+  }
 
   const post = postRepo.create({
-    text: parsed.data.text,
-    imageUrl: parsed.data.imageUrl ?? null,
-    authorId: me.id,
-    status: admin ? PostStatus.APPROVED : PostStatus.PENDING,
-    approvedAt: admin ? new Date() : null,
+    text: text.trim(),
+    author: me,
+    status: isAdmin(session) ? PostStatus.APPROVED : PostStatus.PENDING,
+    imageKey,
+    imageUrl,
   });
 
   await postRepo.save(post);
 
-  return NextResponse.json({ post }, { status: 201 });
+  return NextResponse.json({ ok: true, post }, { status: 201 });
 }
