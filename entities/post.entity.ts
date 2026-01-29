@@ -22,9 +22,6 @@ export class Post extends BaseEntity {
   @Column()
   text!: string;
 
-  @Column({ name: 'image_url', type: 'varchar', nullable: true })
-  imageUrl!: string | null;
-
   @Column({
     type: 'enum',
     enum: PostStatus,
@@ -41,4 +38,10 @@ export class Post extends BaseEntity {
 
   @Column({ name: 'approved_at', type: 'timestamptz', nullable: true })
   approvedAt!: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  imageKey?: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  imageUrl?: string | null;
 }
