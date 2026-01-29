@@ -30,4 +30,10 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamptz', nullable: true })
   emailVerifiedAt!: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  profileImageKey?: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  profileImageUrl?: string | null;
 }

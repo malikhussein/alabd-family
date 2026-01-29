@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { Post, PostStatus } from '../../../../entities/post.entity';
 import { getDb } from '../../../../lib/db';
 import { isAdmin, requireSession } from '../../../../lib/helpers/auth.helper';
-import { updatePostSchema } from '../../../../lib/validation/post';
 import { Like } from '../../../../entities/like.entity';
 import { User } from '../../../../entities/user.entity';
+import { uploadImageToS3 } from '../../../../lib/upload-image';
 
 export async function GET(
   _req: Request,
@@ -85,28 +85,21 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await requireSession();
-  if (!session?.user?.email)
+  if (!session?.user?.email) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-
-  const body = await req.json().catch(() => null);
-  const parsed = updatePostSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        message: 'Validation error',
-        errors: parsed.error.flatten().fieldErrors,
-      },
-      { status: 400 },
-    );
   }
 
   const { id } = await params;
   const postId = Number(id);
+  if (!Number.isFinite(postId)) {
+    return NextResponse.json({ message: 'Invalid id' }, { status: 400 });
+  }
 
   const db = await getDb();
-  const repo = db.getRepository(Post);
+  const postRepo = db.getRepository(Post);
+  const userRepo = db.getRepository(User);
 
-  const post = await repo.findOne({
+  const post = await postRepo.findOne({
     where: { id: postId },
     relations: { author: true },
   });
@@ -114,34 +107,62 @@ export async function PATCH(
   if (!post)
     return NextResponse.json({ message: 'Post not found' }, { status: 404 });
 
-  const isOwner =
-    post.author?.email?.toLowerCase() === session.user.email.toLowerCase();
+  const me = await userRepo.findOne({
+    where: { email: session.user.email.toLowerCase() },
+  });
+  if (!me)
+    return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
-  if (!isAdmin(session) && !isOwner) {
+  const owner = post.author?.id === me.id;
+  if (!isAdmin(session) && !owner) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
-  // Can the moderator edit approved posts?
-  if (!isAdmin(session) && post.status === PostStatus.APPROVED) {
-    return NextResponse.json(
-      { message: 'Cannot edit approved post' },
-      { status: 403 },
-    );
+  const form = await req.formData();
+
+  // Optional updates
+  const text = form.get('text');
+  const file = form.get('file'); // optional
+  const removeImage = form.get('removeImage'); // optional: "true"
+
+  if (typeof text === 'string') {
+    const trimmed = text.trim();
+    if (!trimmed)
+      return NextResponse.json(
+        { message: 'text cannot be empty' },
+        { status: 400 },
+      );
+    post.text = trimmed;
   }
 
-  const { text, imageUrl } = parsed.data;
+  // remove image
+  if (removeImage === 'true') {
+    post.imageKey = null;
+    post.imageUrl = null;
+  }
 
-  if (text !== undefined) post.text = text;
-  if (imageUrl !== undefined) post.imageUrl = imageUrl;
+  // replace / set image
+  if (file instanceof File) {
+    const userKey = session.user.id ?? session.user.email ?? 'user';
 
+    const uploaded = await uploadImageToS3({
+      file,
+      kind: 'post',
+      userKey,
+    });
+
+    post.imageKey = uploaded.key;
+    post.imageUrl = uploaded.publicUrl;
+  }
+
+  // if not admin, editing should require re-approval
   if (!isAdmin(session)) {
     post.status = PostStatus.PENDING;
-    post.approvedAt = null;
   }
 
-  await repo.save(post);
+  await postRepo.save(post);
 
-  return NextResponse.json({ ok: true, post });
+  return NextResponse.json({ ok: true, post }, { status: 200 });
 }
 
 export async function DELETE(
