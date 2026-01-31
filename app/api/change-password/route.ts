@@ -35,12 +35,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
   }
 
-  const isMatch = await bcrypt.compare(currentPassword, user.password);
-  if (!isMatch) {
-    return NextResponse.json(
-      { message: 'Current password is incorrect' },
-      { status: 400 },
-    );
+  if (user.password) {
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { message: 'Current password is incorrect' },
+        { status: 400 },
+      );
+    }
   }
 
   user.password = await bcrypt.hash(newPassword, 12);
