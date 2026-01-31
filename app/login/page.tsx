@@ -73,6 +73,13 @@ export default function LoginPage() {
       <p style={{ marginTop: 12 }}>
         Don’t have an account? <Link href="/signup">Sign up</Link>
       </p>
+
+      <button
+        type="button"
+        onClick={() => signIn('google', { callbackUrl: '/' })}
+      >
+        Continue with Google
+      </button>
     </div>
   );
 }
