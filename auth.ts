@@ -2,7 +2,8 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import * as bcrypt from 'bcrypt';
 import { getDb } from '@/lib/db';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
+import Google from 'next-auth/providers/google';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
@@ -39,15 +40,53 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       },
     }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      // user exists only on sign-in
-      if (user) {
-        token.role = user.role;
+    async jwt({ token, user, account }) {
+      // Only on sign-in (credentials or google)
+      if (user?.email) {
+        const db = await getDb();
+        const repo = db.getRepository(User);
+
+        const email = user.email.toLowerCase();
+        let dbUser = await repo.findOne({ where: { email } });
+
+        const isGoogle = account?.provider === 'google';
+
+        if (!dbUser) {
+          dbUser = repo.create({
+            email,
+            name: user.name ?? email.split('@')[0],
+            // ✅ Google users considered verified
+            emailVerifiedAt: isGoogle ? new Date() : null,
+            role: UserRole.USER,
+
+            password: null,
+
+            profileImageUrl: (user as any).image ?? null,
+            profileImageKey: null,
+          });
+
+          await repo.save(dbUser);
+        } else {
+          // If user exists and logs in with Google, mark as verified (backfill)
+          if (isGoogle && !dbUser.emailVerifiedAt) {
+            dbUser.emailVerifiedAt = new Date();
+            await repo.save(dbUser);
+          }
+        }
+
+        (token as any).id = dbUser.id;
+        (token as any).role = dbUser.role;
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role as any;

@@ -18,8 +18,8 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
-  password!: string;
+  @Column({ type: 'text', nullable: true })
+  password!: string | null;
 
   @Column({
     type: 'enum',
