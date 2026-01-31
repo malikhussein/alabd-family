@@ -68,7 +68,10 @@ services:
       AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
     ports:
       - '3000:3000'
+    volumes:
+      - next_cache:/app/.next/cache
 
 volumes:
   postgres_data:
   minio_data:
+  next_cache:
