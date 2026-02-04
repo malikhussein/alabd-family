@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                                 className="object-cover w-full h-full"
                               />
                             ) : (
-                              <span>{post.author?.name?.charAt(0) || 'م'}</span>
+                              <span>{post.author?.name?.charAt(0)}</span>
                             )}
                           </div>
                         </div>
