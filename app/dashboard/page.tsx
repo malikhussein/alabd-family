@@ -6,27 +6,14 @@ import {
   X,
   Check,
   Trash2,
-  UserPlus,
   ImagePlus,
   ChevronLeft,
   ChevronRight,
+  Shield,
 } from 'lucide-react';
 import usePostStore from '../store/post';
-
-const initialSupervisors = [
-  {
-    id: 1,
-    name: 'عبدالله بن محمد',
-    role: 'مشرف رئيسي',
-    email: 'abdullah@example.com',
-  },
-  {
-    id: 2,
-    name: 'فيصل بن سعود',
-    role: 'مشرف المحتوى',
-    email: 'faisal@example.com',
-  },
-];
+import useUserStore from '../store/user';
+import { UserRole } from '../../entities/user.entity';
 
 const initialBanners = [
   { id: 1, name: 'Banner 1', url: '/images/Frame.png' },
@@ -36,30 +23,38 @@ const initialBanners = [
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('posts');
-  const [supervisors, setSupervisors] = useState(initialSupervisors);
   const [banners, setBanners] = useState(initialBanners);
-  const [newSupervisor, setNewSupervisor] = useState({
-    name: '',
-    role: '',
-    email: '',
-  });
-  const [showAddSupervisor, setShowAddSupervisor] = useState(false);
 
   const {
     pendingPosts,
     fetchPendingPosts,
     pendingMetadata,
-    loading,
-    error,
+    loading: postsLoading,
+    error: postsError,
     approvePost,
     rejectPost,
   } = usePostStore();
+
+  const {
+    users,
+    fetchUsers,
+    toggleRole,
+    loading: usersLoading,
+    error: usersError,
+    metadata: usersMetadata,
+  } = useUserStore();
 
   useEffect(() => {
     fetchPendingPosts(1, 5);
   }, [fetchPendingPosts]);
 
-  // Pagination handlers
+  useEffect(() => {
+    if (activeTab === 'supervisors') {
+      fetchUsers(1, 10, UserRole.MODERATOR);
+    }
+  }, [activeTab, fetchUsers]);
+
+  // Pagination handlers for posts
   const handleNextPage = () => {
     const totalPages = Math.ceil(pendingMetadata.total / pendingMetadata.limit);
     if (pendingMetadata.page < totalPages) {
@@ -70,6 +65,20 @@ export default function AdminDashboard() {
   const handlePreviousPage = () => {
     if (pendingMetadata.page > 1) {
       fetchPendingPosts(pendingMetadata.page - 1, pendingMetadata.limit);
+    }
+  };
+
+  // Pagination handlers for users
+  const handleUsersNextPage = () => {
+    const totalPages = Math.ceil(usersMetadata.total / usersMetadata.limit);
+    if (usersMetadata.page < totalPages) {
+      fetchUsers(usersMetadata.page + 1, usersMetadata.limit, 'SUPERVISOR');
+    }
+  };
+
+  const handleUsersPreviousPage = () => {
+    if (usersMetadata.page > 1) {
+      fetchUsers(usersMetadata.page - 1, usersMetadata.limit, 'SUPERVISOR');
     }
   };
 
@@ -90,34 +99,20 @@ export default function AdminDashboard() {
     }
   };
 
-  // Supervisor Management
-  const addSupervisor = async () => {
-    if (newSupervisor.name && newSupervisor.role && newSupervisor.email) {
-      // TODO: Add API call to create supervisor
-      // await fetch('/api/supervisors', { method: 'POST', body: JSON.stringify(newSupervisor) });
-
-      setSupervisors([...supervisors, { ...newSupervisor, id: Date.now() }]);
-      setNewSupervisor({ name: '', role: '', email: '' });
-      setShowAddSupervisor(false);
+  // User Role Management
+  const handleToggleRole = async (userId: number, currentRole: string) => {
+    try {
+      const newRole = currentRole === 'SUPERVISOR' ? 'USER' : 'SUPERVISOR';
+      await toggleRole(userId, newRole);
+    } catch (error) {
+      console.error('Error toggling role:', error);
     }
-  };
-
-  const removeSupervisor = async (id: number) => {
-    // TODO: Add API call to delete supervisor
-    // await fetch(`/api/supervisors/${id}`, { method: 'DELETE' });
-
-    setSupervisors(supervisors.filter((sup) => sup.id !== id));
   };
 
   // Banner Management
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // TODO: Upload to your storage (e.g., AWS S3, Cloudinary, etc.)
-      // const formData = new FormData();
-      // formData.append('file', file);
-      // await fetch('/api/upload', { method: 'POST', body: formData });
-
       const reader = new FileReader();
       reader.onload = (event) => {
         setBanners([
@@ -134,14 +129,11 @@ export default function AdminDashboard() {
   };
 
   const deleteBanner = async (id: number) => {
-    // TODO: Add API call to delete banner
-    // await fetch(`/api/banners/${id}`, { method: 'DELETE' });
-
     setBanners(banners.filter((banner) => banner.id !== id));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 to-gray-800">
       <div className="container mx-auto px-4 py-8">
         {/* Tabs Navigation */}
         <div className="flex flex-wrap gap-2 mb-8 bg-gray-800 p-2 rounded-lg">
@@ -185,18 +177,18 @@ export default function AdminDashboard() {
                 المنشورات قيد المراجعة
               </h2>
 
-              {loading && (
+              {postsLoading && (
                 <p className="text-gray-400 text-center py-8">
                   جاري التحميل...
                 </p>
               )}
 
-              {error && (
-                <p className="text-red-400 text-center py-8">{error}</p>
+              {postsError && (
+                <p className="text-red-400 text-center py-8">{postsError}</p>
               )}
 
               <div className="space-y-4">
-                {!loading && !error && pendingPosts.length === 0 ? (
+                {!postsLoading && !postsError && pendingPosts.length === 0 ? (
                   <p className="text-gray-400 text-center py-8">
                     لا توجد منشورات قيد المراجعة
                   </p>
@@ -224,7 +216,7 @@ export default function AdminDashboard() {
                               )}
                             </p>
                           </div>
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
+                          <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                             {post.author?.profileImageUrl ? (
                               <Image
                                 src={post.author.profileImageUrl}
@@ -262,7 +254,7 @@ export default function AdminDashboard() {
                         <div className="flex gap-2 pt-4 border-t border-gray-600">
                           <button
                             onClick={() => handleApprove(post.id)}
-                            disabled={loading}
+                            disabled={postsLoading}
                             className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Check size={20} />
@@ -270,7 +262,7 @@ export default function AdminDashboard() {
                           </button>
                           <button
                             onClick={() => handleReject(post.id)}
-                            disabled={loading}
+                            disabled={postsLoading}
                             className="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <X size={20} />
@@ -284,7 +276,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Pagination controls */}
-              {!loading && !error && pendingPosts.length > 0 && (
+              {!postsLoading && !postsError && pendingPosts.length > 0 && (
                 <div className="mt-6 flex items-center justify-between">
                   <button
                     onClick={handleNextPage}
@@ -327,92 +319,112 @@ export default function AdminDashboard() {
         {activeTab === 'supervisors' && (
           <div className="space-y-6">
             <div className="bg-gray-800 rounded-lg p-6 shadow-xl">
-              <div className="flex justify-between items-center mb-6">
-                <button
-                  onClick={() => setShowAddSupervisor(!showAddSupervisor)}
-                  className="bg-primary hover:bg-amber-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold transition-all"
-                >
-                  <UserPlus size={20} />
-                  إضافة مشرف جديد
-                </button>
-                <h2 className="text-2xl font-bold text-amber-400 text-right">
-                  قائمة المشرفين
-                </h2>
-              </div>
+              <h2 className="text-2xl font-bold text-amber-400 mb-6 text-right">
+                قائمة المشرفين
+              </h2>
 
-              {showAddSupervisor && (
-                <div className="bg-gray-700 rounded-lg p-6 mb-6">
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="الاسم"
-                      value={newSupervisor.name}
-                      onChange={(e) =>
-                        setNewSupervisor({
-                          ...newSupervisor,
-                          name: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-600 text-white px-4 py-3 rounded-lg text-right"
-                    />
-                    <input
-                      type="text"
-                      placeholder="الدور الوظيفي"
-                      value={newSupervisor.role}
-                      onChange={(e) =>
-                        setNewSupervisor({
-                          ...newSupervisor,
-                          role: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-600 text-white px-4 py-3 rounded-lg text-right"
-                    />
-                    <input
-                      type="email"
-                      placeholder="البريد الإلكتروني"
-                      value={newSupervisor.email}
-                      onChange={(e) =>
-                        setNewSupervisor({
-                          ...newSupervisor,
-                          email: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-600 text-white px-4 py-3 rounded-lg text-right"
-                    />
-                    <button
-                      onClick={addSupervisor}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition-all"
-                    >
-                      حفظ المشرف
-                    </button>
-                  </div>
-                </div>
+              {usersLoading && (
+                <p className="text-gray-400 text-center py-8">
+                  جاري التحميل...
+                </p>
+              )}
+
+              {usersError && (
+                <p className="text-red-400 text-center py-8">{usersError}</p>
               )}
 
               <div className="space-y-4">
-                {supervisors.map((supervisor) => (
-                  <div
-                    key={supervisor.id}
-                    className="bg-gray-700 rounded-lg p-6 flex justify-between items-center hover:bg-gray-650 transition-all"
-                  >
-                    <button
-                      onClick={() => removeSupervisor(supervisor.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-all"
+                {!usersLoading && !usersError && users.length === 0 ? (
+                  <p className="text-gray-400 text-center py-8">
+                    لا يوجد مشرفين حالياً
+                  </p>
+                ) : (
+                  users.map((user) => (
+                    <div
+                      key={user.id}
+                      className="bg-gray-700 rounded-lg p-6 hover:bg-gray-650 transition-all"
                     >
-                      <Trash2 size={20} />
-                    </button>
-                    <div className="text-right flex-1 mr-4">
-                      <h3 className="text-xl font-bold text-amber-400">
-                        {supervisor.name}
-                      </h3>
-                      <p className="text-gray-200">{supervisor.role}</p>
-                      <p className="text-sm text-gray-400">
-                        {supervisor.email}
-                      </p>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleToggleRole(user.id, user.role)}
+                            disabled={usersLoading}
+                            className={`px-4 py-2 rounded-lg flex items-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-amber-600 hover:bg-amber-700 text-white`}
+                          >
+                            <>
+                              <Shield size={20} />
+                              إلغاء الإشراف
+                            </>
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <h3 className="text-xl font-bold text-amber-400">
+                              {user.name}
+                            </h3>
+                            <p className="text-gray-200 text-sm">
+                              {user.email}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {user.role === 'SUPERVISOR' ? 'مشرف' : 'مستخدم'}
+                            </p>
+                          </div>
+                          <div className="w-16 h-16 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
+                            {user.profileImageUrl ? (
+                              <Image
+                                src={user.profileImageUrl}
+                                alt={user.name}
+                                width={64}
+                                height={64}
+                                className="object-cover w-full h-full"
+                              />
+                            ) : (
+                              <span>{user.name.charAt(0)}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
+
+              {/* Pagination controls for users */}
+              {!usersLoading && !usersError && users.length > 0 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <button
+                    onClick={handleUsersNextPage}
+                    disabled={
+                      usersMetadata.page >=
+                      Math.ceil(usersMetadata.total / usersMetadata.limit)
+                    }
+                    className="bg-primary hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft size={20} />
+                    التالي
+                  </button>
+
+                  <div className="text-center text-gray-400">
+                    <p>
+                      الصفحة {usersMetadata.page} من{' '}
+                      {Math.ceil(usersMetadata.total / usersMetadata.limit)}
+                    </p>
+                    <p className="text-sm">
+                      عرض {users.length} من أصل {usersMetadata.total} مستخدم
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleUsersPreviousPage}
+                    disabled={usersMetadata.page <= 1}
+                    className="bg-primary hover:bg-amber-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    السابق
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
