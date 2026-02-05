@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { User } from '../../../entities/user.entity';
+import { User, UserRole } from '../../../entities/user.entity';
 import { getDb } from '../../../lib/db';
 import {
   isAdmin,
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       { message: 'Unauthorized' },
       {
         status: 401,
-      }
+      },
     );
   }
 
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
       { message: 'Forbidden' },
       {
         status: 403,
-      }
+      },
     );
   }
 
@@ -33,14 +33,16 @@ export async function GET(req: Request) {
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'));
   const limit = Math.min(
     100,
-    Math.max(1, Number(searchParams.get('limit') ?? '20'))
+    Math.max(1, Number(searchParams.get('limit') ?? '20')),
   );
   const skip = (page - 1) * limit;
+  const role = searchParams.get('role');
 
   const db = await getDb();
   const repo = db.getRepository(User);
 
   const [users, total] = await repo.findAndCount({
+    where: role ? { role: role as UserRole } : {},
     order: { createdAt: 'DESC' },
     skip,
     take: limit,

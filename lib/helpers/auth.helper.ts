@@ -1,6 +1,8 @@
 import { Session } from 'next-auth';
 import { auth } from '../../auth';
 import { UserRole } from '../../entities/user.entity';
+import { profile } from 'console';
+import { email } from 'zod';
 
 export async function requireSession() {
   const session = await auth();
@@ -26,6 +28,8 @@ export function toPublicUser(u: any) {
     name: u.name,
     email: u.email,
     role: u.role,
+    emailVerified: u.emailVerified,
+    profileImageUrl: u.profileImageUrl,
     createdAt: u.createdAt,
     updatedAt: u.updatedAt,
   };
