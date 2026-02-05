@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         port: '9000',
         pathname: '/alabd/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '**',
+      },
     ],
   },
 };
