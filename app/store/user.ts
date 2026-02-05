@@ -20,7 +20,12 @@ interface UserStore {
     limit: number;
     total: number;
   };
-  fetchUsers: (page?: number, limit?: number, role?: string) => Promise<void>;
+  fetchUsers: (
+    page?: number,
+    limit?: number,
+    role?: string,
+    keyword?: string,
+  ) => Promise<void>;
   toggleRole: (userId: number, newRole: string) => Promise<void>;
 }
 
@@ -34,13 +39,24 @@ const useUserStore = create<UserStore>((set, get) => ({
     total: 0,
   },
 
-  async fetchUsers(page = 1, limit = 10, role?: string) {
+  async fetchUsers(page = 1, limit = 10, role?: string, keyword?: string) {
     set({ loading: true, error: null });
 
     try {
-      const { data } = await axios.get('/api/user', {
-        params: { page, limit, role },
-      });
+      const params: {
+        page: number;
+        limit: number;
+        role?: string;
+        keyword?: string;
+      } = { page, limit };
+      if (role) {
+        params.role = role;
+      }
+      if (keyword) {
+        params.keyword = keyword;
+      }
+
+      const { data } = await axios.get('/api/user', { params });
 
       set({
         users: data.items || [],
@@ -69,7 +85,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const { data } = await axios.post(`/api/user/${userId}/toggle-role`, {
+      const { data } = await axios.patch(`/api/user/${userId}/toggle-role`, {
         role: newRole,
       });
 
