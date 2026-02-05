@@ -1,8 +1,6 @@
 import { Session } from 'next-auth';
 import { auth } from '../../auth';
-import { UserRole } from '../../entities/user.entity';
-import { profile } from 'console';
-import { email } from 'zod';
+import { UserRole, User } from '../../entities/user.entity';
 
 export async function requireSession() {
   const session = await auth();
@@ -22,13 +20,13 @@ export function isUser(session: Session): boolean {
   return session?.user?.role === UserRole.USER;
 }
 
-export function toPublicUser(u: any) {
+export function toPublicUser(u: User) {
   return {
     id: u.id,
     name: u.name,
     email: u.email,
     role: u.role,
-    emailVerified: u.emailVerified,
+    emailVerifiedAt: u.emailVerifiedAt,
     profileImageUrl: u.profileImageUrl,
     createdAt: u.createdAt,
     updatedAt: u.updatedAt,

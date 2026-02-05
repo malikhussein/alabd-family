@@ -6,6 +6,7 @@ import {
   requireSession,
   toPublicUser,
 } from '../../../lib/helpers/auth.helper';
+import { FindOptionsWhere, ILike } from 'typeorm';
 
 export async function GET(req: Request) {
   const session = await requireSession();
@@ -38,11 +39,23 @@ export async function GET(req: Request) {
   const skip = (page - 1) * limit;
   const role = searchParams.get('role');
 
+  const keyword = searchParams.get('keyword');
+
   const db = await getDb();
   const repo = db.getRepository(User);
 
+  const whereCondition: FindOptionsWhere<User> = {};
+
+  if (role) {
+    whereCondition.role = role as UserRole;
+  }
+
+  if (keyword) {
+    whereCondition.name = ILike(`%${keyword}%`);
+  }
+
   const [users, total] = await repo.findAndCount({
-    where: role ? { role: role as UserRole } : {},
+    where: whereCondition,
     order: { createdAt: 'DESC' },
     skip,
     take: limit,
