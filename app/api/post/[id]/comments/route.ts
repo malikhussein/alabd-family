@@ -64,10 +64,7 @@ export async function POST(
 
   await commentRepo.save(comment);
 
-  return NextResponse.json(
-    { ok: true, commentId: comment.id },
-    { status: 201 },
-  );
+  return NextResponse.json({ ok: true, comment: comment }, { status: 201 });
 }
 
 export async function GET(
