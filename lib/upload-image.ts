@@ -5,7 +5,7 @@ import { s3 } from '@/lib/s3';
 const MAX_MB = 5;
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
-export type UploadKind = 'avatar' | 'post';
+export type UploadKind = 'avatar' | 'post' | 'banner';
 
 function extFromType(type: string) {
   if (type === 'image/jpeg') return 'jpg';
@@ -52,7 +52,16 @@ export async function uploadImageToS3(params: {
   }
 
   const random = crypto.randomBytes(16).toString('hex');
-  const folder = kind === 'avatar' ? 'avatars' : 'posts';
+
+  let folder: string;
+  if (kind === 'avatar') {
+    folder = 'avatars';
+  } else if (kind === 'banner') {
+    folder = 'banners';
+  } else {
+    folder = 'posts';
+  }
+
   const key =
     kind === 'avatar'
       ? `${folder}/${safeSegment(userKey!)}/${random}.${ext}`
