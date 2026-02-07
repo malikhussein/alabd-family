@@ -11,7 +11,6 @@ import { BaseEntity } from './base.entity';
 import { Post } from './post.entity';
 import { User } from './user.entity';
 
-@Unique('UQ_comment_post_user', ['postId', 'userId'])
 @Index('IDX_comment_post', ['postId'])
 @Index('IDX_comment_user', ['userId'])
 @Entity('comments')
