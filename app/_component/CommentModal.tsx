@@ -1,23 +1,31 @@
-"use client";
-import { Send, Heart, MoreVertical, Trash2, MessageCircle } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+'use client';
+import { Send, MoreVertical, Trash2, MessageCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
-
+interface Comment {
+  id: string;
+  content: string;
+  user: {
+    id: number;
+    name: string;
+  };
+  createdAt: Date;
+}
 
 interface CommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: number | null;
   comments: Comment[];
-  onAddComment: (postId: number, text: string) => void;  // ← Changed to number
-  onLikeComment: (commentId: number) => void;  // ← Changed to number
-  onDeleteComment?: (commentId: number) => void;  // ← Changed to number
+  onAddComment: (postId: number, text: string) => void;
+  onLikeComment?: (commentId: string) => void;
+  onDeleteComment?: (commentId: string) => void;
   currentUserId?: string;
 }
 
@@ -27,12 +35,11 @@ export default function CommentsModal({
   postId,
   comments,
   onAddComment,
-  onLikeComment,
   onDeleteComment,
   currentUserId,
 }: CommentsModalProps) {
-  const [commentText, setCommentText] = useState("");
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);  // ← Changed to number
+  const [commentText, setCommentText] = useState('');
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +50,7 @@ export default function CommentsModal({
   }, [isOpen]);
 
   const scrollToBottom = () => {
-    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -52,18 +59,18 @@ export default function CommentsModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (commentText.trim() && postId !== null) {  // ← Added null check
+    if (commentText.trim() && postId !== null) {
+      // ← Added null check
       onAddComment(postId, commentText.trim());
-      setCommentText("");
+      setCommentText('');
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (date: Date) => {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return "الآن";
+    if (diffInSeconds < 60) return 'الآن';
     if (diffInSeconds < 3600)
       return `منذ ${Math.floor(diffInSeconds / 60)} دقيقة`;
     if (diffInSeconds < 86400)
@@ -71,9 +78,9 @@ export default function CommentsModal({
     if (diffInSeconds < 604800)
       return `منذ ${Math.floor(diffInSeconds / 86400)} يوم`;
 
-    return date.toLocaleDateString("ar-EG", {
-      month: "short",
-      day: "numeric",
+    return date.toLocaleDateString('ar-EG', {
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -105,7 +112,8 @@ export default function CommentsModal({
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {comment.user?.name?.charAt(0).toUpperCase() || "؟"}  {/* ← Added safe navigation */}
+                    {comment.user?.name?.charAt(0).toUpperCase() || '؟'}{' '}
+                    {/* ← Added safe navigation */}
                   </div>
                 </div>
 
@@ -115,7 +123,8 @@ export default function CommentsModal({
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-sm text-white">
-                          {comment.user?.name || "مستخدم"}  {/* ← Added fallback */}
+                          {comment.user?.name || 'مستخدم'}{' '}
+                          {/* ← Added fallback */}
                         </span>
                         <span className="text-xs text-gray-500">
                           {formatDate(comment.createdAt)}
@@ -127,41 +136,42 @@ export default function CommentsModal({
                     </div>
 
                     {/* More Options */}
-                    {currentUserId === comment.user?.id.toString() && onDeleteComment && (
-                      <div className="relative">
-                        <button
-                          onClick={() =>
-                            setActiveMenu(
-                              activeMenu === comment.id ? null : comment.id
-                            )
-                          }
-                          className="p-1 hover:bg-gray-700 rounded-full transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <MoreVertical className="w-4 h-4 text-gray-400" />
-                        </button>
+                    {currentUserId === comment.user?.id.toString() &&
+                      onDeleteComment && (
+                        <div className="relative">
+                          <button
+                            onClick={() =>
+                              setActiveMenu(
+                                activeMenu === comment.id ? null : comment.id,
+                              )
+                            }
+                            className="p-1 hover:bg-gray-700 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <MoreVertical className="w-4 h-4 text-gray-400" />
+                          </button>
 
-                        {activeMenu === comment.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-40"
-                              onClick={() => setActiveMenu(null)}
-                            />
-                            <div className="absolute left-0 mt-1 bg-gray-800 rounded-lg shadow-xl border border-gray-700 py-1 z-50 min-w-[120px]">
-                              <button
-                                onClick={() => {
-                                  onDeleteComment(comment.id);
-                                  setActiveMenu(null);
-                                }}
-                                className="w-full px-4 py-2 text-xs text-right hover:bg-gray-700 transition-colors flex items-center gap-2 text-red-400"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                حذف
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
+                          {activeMenu === comment.id && (
+                            <>
+                              <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setActiveMenu(null)}
+                              />
+                              <div className="absolute left-0 mt-1 bg-gray-800 rounded-lg shadow-xl border border-gray-700 py-1 z-50 min-w-[120px]">
+                                <button
+                                  onClick={() => {
+                                    onDeleteComment(comment.id);
+                                    setActiveMenu(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-xs text-right hover:bg-gray-700 transition-colors flex items-center gap-2 text-red-400"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  حذف
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
