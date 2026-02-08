@@ -1,10 +1,10 @@
 import React from "react";
- import hzImage from "../../public/images/hz.png";
+import hzImage from "../../public/images/hz.png";
 import CardPosts from "../_component/cardPostst";
 import SideBar from "../_component/sideBar";
 import Image from "next/image";
-
-export default function page() {
+ 
+ export default function Posts() {
   return (
     <>
       <div className="container mx-auto px-4 py-12 md:py-20 ">
