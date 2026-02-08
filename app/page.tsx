@@ -1,16 +1,15 @@
-import Image from "next/image";
-import { auth } from "../auth";
-import { redirect } from "next/navigation";
-import bannerImage from "../public/images/Frame.png";
-import banner2Image from "../public/images/Frame 12.png";
-import banner3Image from "../public/images/Frame 8.png";
-import banner4Image from "../public/images/image 1.png";
-import NavBar from "./_component/navBar";
+import Image from 'next/image';
+import { auth } from '../auth';
+import { redirect } from 'next/navigation';
+import bannerImage from '../public/images/Frame.png';
+import banner2Image from '../public/images/Frame 12.png';
+import banner3Image from '../public/images/Frame 8.png';
+import BannersSection from './_component/bannersSection';
 
 export default async function Home() {
   const session = await auth();
   if (!session) {
-    redirect("/login");
+    redirect('/login');
   }
 
   return (
@@ -84,12 +83,10 @@ export default async function Home() {
               <div className="absolute inset-0  bg-[#B1771F]/65" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                    الحاف   
-
+                  الحاف
                 </h3>
                 <p className="text-base md:text-lg text-gray-200">
-   ابن غانم
-   ابن العبد
+                  ابن غانم ابن العبد
                 </p>
               </div>
             </div>
@@ -105,14 +102,13 @@ export default async function Home() {
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  برقع  
+                  برقع
                 </h3>
                 <p className="text-base md:text-lg text-gray-200">
-   ابن غانم
-   ابن العبد  
+                  ابن غانم ابن العبد
                 </p>
               </div>
             </div>
@@ -131,9 +127,12 @@ export default async function Home() {
               <div className="absolute inset-0  bg-[#B1771F]/65" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-فايع                </h3>
-                <p className="text-base md:text-lg text-gray-200">                  ابن رشيد ابن العبد
-</p>
+                  فايع{' '}
+                </h3>
+                <p className="text-base md:text-lg text-gray-200">
+                  {' '}
+                  ابن رشيد ابن العبد
+                </p>
               </div>
             </div>
           </div>
@@ -148,7 +147,7 @@ export default async function Home() {
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
                   محمد
@@ -163,80 +162,7 @@ export default async function Home() {
       </div>
 
       {/* Sheikhs and Notable Figures Section */}
-      <div className="container mx-auto px-4 py-12 md:py-20 primary-foreground">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-amber-400 mb-6">
-            شيوخها ورجالاتها
-          </h2>
-          <p className="text-3xl  leading-relaxed text-gray-200 max-w-4xl mx-auto">
-            هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم
-            بالكرم والشجاعة ونبل الأخلاق
-          </p>
-        </div>
-
-        {/* Sheikhs Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-8  mx-auto">
-          {/* Sheikh Card 1 */}
-          <div className="group relative overflow-hidden  shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="relative h-64 md:h-72 lg:h-120 border-2 border-amber-400">
-              <Image
-                className="object-cover"
-                src={banner4Image}
-                alt="الشيخ فيصل بن راشد آل العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 ccc  bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  الشيخ فيصل بن راشد
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">آل العبد</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Sheikh Card 2 */}
-          <div className="group relative overflow-hidden    hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="relative h-64 md:h-72 lg:h-120 border-2 border-amber-400">
-              <Image
-                className="object-cover"
-                src={banner4Image}
-                alt="الشيخ سعود بن راشد آل العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  الشيخ سعود بن راشد
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">آل العبد</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Sheikh Card 3 */}
-          <div className="group relative overflow-hidden   shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="relative h-64 md:h-72 lg:h-120 border-2 border-amber-400">
-              <Image
-                className="object-cover"
-                src={banner4Image}
-                alt="الشيخ فيصل بن راشد آل العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  الشيخ فيصل بن راشد
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">آل العبد</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <BannersSection />
 
       {/* Footer Spacing */}
       <div className="h-20"></div>
