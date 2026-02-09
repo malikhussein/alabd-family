@@ -12,22 +12,23 @@ import {
   Shield,
   Users,
   Search,
+  Edit,
 } from 'lucide-react';
 import usePostStore from '../store/post';
 import useUserStore from '../store/user';
+import useBannerStore from '../store/banner';
 import { UserRole } from '../../entities/user.entity';
-
-const initialBanners = [
-  { id: 1, name: 'Banner 1', url: '/images/Frame.png' },
-  { id: 2, name: 'Banner 2', url: '/images/Frame 12.png' },
-  { id: 3, name: 'Banner 3', url: '/images/Frame 8.png' },
-];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('posts');
-  const [banners, setBanners] = useState(initialBanners);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [showBannerForm, setShowBannerForm] = useState(false);
+  const [bannerText, setBannerText] = useState('');
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [editingBanner, setEditingBanner] = useState<number | null>(null);
+  const [editBannerText, setEditBannerText] = useState('');
+  const [editBannerFile, setEditBannerFile] = useState<File | null>(null);
 
   const {
     pendingPosts,
@@ -48,6 +49,16 @@ export default function AdminDashboard() {
     metadata: usersMetadata,
   } = useUserStore();
 
+  const {
+    banners,
+    loading: bannersLoading,
+    error: bannersError,
+    fetchBanners,
+    createBanner,
+    updateBanner,
+    deleteBanner,
+  } = useBannerStore();
+
   useEffect(() => {
     fetchPendingPosts(1, 5);
   }, [fetchPendingPosts]);
@@ -63,6 +74,12 @@ export default function AdminDashboard() {
       fetchUsers(1, 10, UserRole.USER, searchKeyword);
     }
   }, [activeTab, searchKeyword, fetchUsers]);
+
+  useEffect(() => {
+    if (activeTab === 'banners') {
+      fetchBanners();
+    }
+  }, [activeTab, fetchBanners]);
 
   // Pagination handlers for posts
   const handleNextPage = () => {
@@ -180,30 +197,92 @@ export default function AdminDashboard() {
   };
 
   // Banner Management
-  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setBanners([
-          ...banners,
-          {
-            id: Date.now(),
-            name: file.name,
-            url: event.target?.result as string,
-          },
-        ]);
-      };
-      reader.readAsDataURL(file);
+      setBannerFile(file);
     }
   };
 
-  const deleteBanner = async (id: number) => {
-    setBanners(banners.filter((banner) => banner.id !== id));
+  const handleCreateBanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bannerFile || !bannerText.trim()) {
+      alert('يرجى إدخال النص واختيار صورة للبنر');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', bannerFile);
+      formData.append('text', bannerText.trim());
+
+      await createBanner(formData);
+      // Reset form
+      setBannerText('');
+      setBannerFile(null);
+      setShowBannerForm(false);
+    } catch (error) {
+      console.error('Error uploading banner:', error);
+    }
+  };
+
+  const handleEditBannerFileSelect = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setEditBannerFile(file);
+    }
+  };
+
+  const handleStartEdit = (banner: { id: number; text: string }) => {
+    setEditingBanner(banner.id);
+    setEditBannerText(banner.text);
+    setEditBannerFile(null);
+  };
+
+  const handleUpdateBanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBanner) return;
+
+    if (!editBannerText.trim()) {
+      alert('يرجى إدخال النص للبنر');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('text', editBannerText.trim());
+      if (editBannerFile) {
+        formData.append('file', editBannerFile);
+      }
+
+      await updateBanner(editingBanner, formData);
+      // Reset edit state
+      setEditingBanner(null);
+      setEditBannerText('');
+      setEditBannerFile(null);
+    } catch (error) {
+      console.error('Error updating banner:', error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBanner(null);
+    setEditBannerText('');
+    setEditBannerFile(null);
+  };
+
+  const handleDeleteBanner = async (id: number) => {
+    try {
+      await deleteBanner(id);
+    } catch (error) {
+      console.error('Error deleting banner:', error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 to-gray-800">
       <div className="container mx-auto px-4 py-8">
         {/* Tabs Navigation */}
         <div className="flex flex-wrap gap-2 mb-8 bg-gray-800 p-2 rounded-lg">
@@ -296,7 +375,7 @@ export default function AdminDashboard() {
                               )}
                             </p>
                           </div>
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
+                          <div className="w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                             {post.author?.profileImageUrl ? (
                               <Image
                                 src={post.author.profileImageUrl}
@@ -447,7 +526,7 @@ export default function AdminDashboard() {
                               مشرف
                             </p>
                           </div>
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
+                          <div className="w-16 h-16 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
                             {user.profileImageUrl ? (
                               <Image
                                 src={user.profileImageUrl}
@@ -606,7 +685,7 @@ export default function AdminDashboard() {
                               )}
                             </p>
                           </div>
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
+                          <div className="w-16 h-16 rounded-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
                             {user.profileImageUrl ? (
                               <Image
                                 src={user.profileImageUrl}
@@ -669,46 +748,182 @@ export default function AdminDashboard() {
         {activeTab === 'banners' && (
           <div className="bg-gray-800 rounded-lg p-6 shadow-xl">
             <div className="flex justify-between items-center mb-6">
-              <label className="bg-primary hover:bg-amber-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold cursor-pointer transition-all">
+              <button
+                onClick={() => setShowBannerForm(!showBannerForm)}
+                disabled={bannersLoading}
+                className="bg-primary hover:bg-amber-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ImagePlus size={20} />
-                إضافة بنر جديد
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                  className="hidden"
-                />
-              </label>
+                {showBannerForm ? 'إلغاء' : 'إضافة بنر جديد'}
+              </button>
               <h2 className="text-2xl font-bold text-amber-400 text-right">
                 إدارة البنرات
               </h2>
             </div>
 
+            {/* Add Banner Form */}
+            {showBannerForm && (
+              <form
+                onSubmit={handleCreateBanner}
+                className="bg-gray-700 rounded-lg p-6 mb-6"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-amber-400 font-bold mb-2 text-right">
+                      نص البنر *
+                    </label>
+                    <input
+                      type="text"
+                      value={bannerText}
+                      onChange={(e) => setBannerText(e.target.value)}
+                      placeholder="أدخل نص البنر..."
+                      className="w-full bg-gray-600 text-white px-4 py-3 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-primary"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-amber-400 font-bold mb-2 text-right">
+                      صورة البنر *
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBannerFileSelect}
+                      className="w-full bg-gray-600 text-white px-4 py-3 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-amber-600"
+                      required
+                    />
+                    {bannerFile && (
+                      <p className="text-gray-300 text-sm mt-2 text-right">
+                        الملف المحدد: {bannerFile.name}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowBannerForm(false);
+                        setBannerText('');
+                        setBannerFile(null);
+                      }}
+                      className="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-bold transition-all"
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={bannersLoading}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      إضافة البنر
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {bannersLoading && (
+              <p className="text-gray-400 text-center py-8">جاري التحميل...</p>
+            )}
+
+            {bannersError && (
+              <p className="text-red-400 text-center py-8">{bannersError}</p>
+            )}
+
+            {!bannersLoading && !bannersError && banners.length === 0 && (
+              <p className="text-gray-400 text-center py-8">
+                لا توجد بنرات. قم بإضافة بنر جديد.
+              </p>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {banners.map((banner) => (
-                <div
-                  key={banner.id}
-                  className="relative group overflow-hidden rounded-lg shadow-xl"
-                >
-                  <div className="relative h-64">
-                    <Image
-                      src={banner.url}
-                      alt={banner.name}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button
-                        onClick={() => deleteBanner(banner.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white p-4 rounded-full transition-all transform scale-0 group-hover:scale-100"
-                      >
-                        <Trash2 size={24} />
-                      </button>
+                <div key={banner.id}>
+                  {editingBanner === banner.id ? (
+                    <form
+                      onSubmit={handleUpdateBanner}
+                      className="bg-gray-700 rounded-lg p-4"
+                    >
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-amber-400 font-bold mb-2 text-right">
+                            نص البنر *
+                          </label>
+                          <input
+                            type="text"
+                            value={editBannerText}
+                            onChange={(e) => setEditBannerText(e.target.value)}
+                            className="w-full bg-gray-600 text-white px-3 py-2 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-primary"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-amber-400 font-bold mb-2 text-right">
+                            صورة جديدة (اختياري)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleEditBannerFileSelect}
+                            className="w-full bg-gray-600 text-white px-3 py-2 rounded-lg text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-amber-600"
+                          />
+                          {editBannerFile && (
+                            <p className="text-gray-300 text-xs mt-1 text-right">
+                              {editBannerFile.name}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all"
+                          >
+                            إلغاء
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={bannersLoading}
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            حفظ
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="relative group overflow-hidden rounded-lg shadow-xl">
+                      <div className="relative h-64">
+                        <Image
+                          src={banner.imageUrl}
+                          alt={banner.text}
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                          <button
+                            onClick={() => handleStartEdit(banner)}
+                            disabled={bannersLoading}
+                            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full transition-all transform scale-0 group-hover:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Edit size={24} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBanner(banner.id)}
+                            disabled={bannersLoading}
+                            className="bg-red-600 hover:bg-red-700 text-white p-4 rounded-full transition-all transform scale-0 group-hover:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Trash2 size={24} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="bg-gray-700 p-4 text-center">
+                        <p className="text-amber-400 font-bold">
+                          {banner.text}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="bg-gray-700 p-4 text-center">
-                    <p className="text-amber-400 font-bold">{banner.name}</p>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>

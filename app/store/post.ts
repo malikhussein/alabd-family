@@ -1,5 +1,5 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface Post {
   id: number;
@@ -15,15 +15,15 @@ interface Post {
 }
 
 interface Comment {
-  id: number;
-  postId: number;
+  id: string;
   content: string;
-  user?: {
+  user: {
     id: number;
     name: string;
     email?: string;
   };
-  createdAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface PostStore {
@@ -63,7 +63,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const { data } = await axios.get("/api/post/pending", {
+      const { data } = await axios.get('/api/post/pending', {
         params: { page, limit },
       });
 
@@ -81,7 +81,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch pending posts";
+        : 'Failed to fetch pending posts';
 
       set({
         error: errorMessage,
@@ -94,7 +94,7 @@ const usePostStore = create<PostStore>((set, get) => ({
   async fetchPosts(page = 1, limit = 10) {
     set({ loading: true, error: null });
     try {
-      const { data } = await axios.get("/api/post", {
+      const { data } = await axios.get('/api/post', {
         params: { page, limit },
       });
       console.log(data);
@@ -103,7 +103,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch posts";
+        : 'Failed to fetch posts';
       set({ error: errorMessage, loading: false });
       throw error;
     }
@@ -124,7 +124,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to approve post";
+        : 'Failed to approve post';
 
       set({
         error: errorMessage,
@@ -149,7 +149,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to reject post";
+        : 'Failed to reject post';
 
       set({
         error: errorMessage,
@@ -170,7 +170,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to like post";
+        : 'Failed to like post';
       set({ error: errorMessage, loading: false });
       throw error;
     }
@@ -179,12 +179,12 @@ const usePostStore = create<PostStore>((set, get) => ({
   async unLikePost(postId: number) {
     set({ loading: true, error: null });
     try {
-      const response = await axios.delete(`/api/post/${postId}/like`);
+      await axios.delete(`/api/post/${postId}/like`);
       await get().fetchPosts();
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to unlike post";
+        : 'Failed to unlike post';
       set({ error: errorMessage, loading: false });
       throw error;
     }
@@ -193,17 +193,13 @@ const usePostStore = create<PostStore>((set, get) => ({
   async createComment(data: { postId: number; content: string }) {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post(
-        `/api/post/${data.postId}/comments`,
-        data,
-      );
-      const { Comment } = get();
-      set({ Comment: [...Comment, response.data], loading: false });
-      console.log(response);
+      await axios.post(`/api/post/${data.postId}/comments`, data);
+      // Reload comments after creating a new one
+      await get().showComments(data.postId);
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to create comment";
+        : 'Failed to create comment';
       set({ error: errorMessage, loading: false });
       throw error;
     }
@@ -213,11 +209,24 @@ const usePostStore = create<PostStore>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const { data } = await axios.get(`/api/post/${postId}/comments`);
-      set({ loading: false, Comment: data.items });
+      const comments = data.items.map(
+        (comment: {
+          id: string;
+          content: string;
+          user: { id: number; name: string; email?: string };
+          createdAt: string;
+          updatedAt: string;
+        }) => ({
+          ...comment,
+          createdAt: new Date(comment.createdAt),
+          updatedAt: new Date(comment.updatedAt),
+        }),
+      );
+      set({ loading: false, Comment: comments });
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch comments";
+        : 'Failed to fetch comments';
       set({ error: errorMessage, loading: false });
       throw error;
     }

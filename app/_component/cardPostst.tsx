@@ -24,17 +24,17 @@ export default function CardPosts() {
 
   const dateFrmat = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ar-EG", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      minute: "2-digit",
-      hour: "2-digit",
+    return date.toLocaleDateString('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      minute: '2-digit',
+      hour: '2-digit',
     });
   };
 
-  const handleAddComment = (postId: string, text: string) => {
-    createComment({ postId: Number(postId), content: text });
+  const handleAddComment = (postId: number, text: string) => {
+    createComment({ postId, content: text });
   };
 
   const handleCreatePost = (text: string, imageUrl: string) => {
@@ -44,7 +44,7 @@ export default function CardPosts() {
   };
 
   const handleDeleteComment = (commentId: string) => {
-    console.log("Deleting comment:", commentId);
+    console.log('Deleting comment:', commentId);
     // Add your delete comment logic here
   };
 
@@ -122,7 +122,7 @@ export default function CardPosts() {
                   <button
                     className={`flex items-center gap-2 
                       hover:scale-120 transition-all duration-150
-                      ${post.likedByMe == true ? "text-red-500" : `text-gray-400`}`}
+                      ${post.likedByMe == true ? 'text-red-500' : `text-gray-400`}`}
                     onClick={() => {
                       if (post.likedByMe == true) {
                         unLikePost(post.id);
