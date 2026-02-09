@@ -38,9 +38,10 @@ export default function CardPosts() {
   };
 
   const handleCreatePost = (text: string, imageUrl: string) => {
-    // Add your create post logic here
+ 
     console.log("Creating post with text:", text, "and image URL:", imageUrl);
     setIsAddPostOpen(false); // Close the modal after creating the post
+    
   };
 
   const handleDeleteComment = (commentId: string) => {

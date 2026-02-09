@@ -1,18 +1,21 @@
 "use client";
 import React, { useState, useRef } from "react";
-import { X, Image, Smile, MapPin, Tag } from "lucide-react";
+import { X, Image, Smile } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-export default function AddPostModal({ isOpen, onClose, onSubmit }) {
+import usePostStore from "../store/post";
+ 
+export default function AddPostModal({ isOpen, onClose }) {
   const [postText, setPostText] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+  
+  const { createPost } = usePostStore(); // Get createPost from store
 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
@@ -34,19 +37,27 @@ export default function AddPostModal({ isOpen, onClose, onSubmit }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!postText.trim() && !selectedImage) return;
 
-    onSubmit({
-      text: postText,
-      image: selectedImage,
-    });
+    // Create FormData
+    const formData = new FormData();
+    formData.append("text", postText);
+    if (selectedImage) {
+      formData.append("image", selectedImage);
+    }
 
-    // Reset form
-    setPostText("");
-    setSelectedImage(null);
-    setImagePreview(null);
-    onClose();
+    try {
+      await createPost(formData);
+      
+      // Reset form
+      setPostText("");
+      setSelectedImage(null);
+      setImagePreview(null);
+      onClose();
+    } catch (error) {
+      console.error("Failed to create post:", error);
+    }
   };
 
   return (
@@ -149,3 +160,4 @@ export default function AddPostModal({ isOpen, onClose, onSubmit }) {
     </Dialog>
   );
 }
+
