@@ -88,7 +88,7 @@ export default function SideBar() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <Heart className="w-5 h-5 text-yellow-500" />
-          <h2 className="text-lg font-bold text-white">أخبر المنشورات أيضاً</h2>
+          <h2 className="text-lg font-bold text-white">أخر المنشورات  </h2>
         </div>
 
         <div className="space-y-4">

@@ -1,8 +1,9 @@
 "use client";
-import { Heart, MessageCircle, Bookmark, Calendar } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Calendar, Plus } from "lucide-react";
 import usePostStore from "../store/post";
 import { useEffect, useState } from "react";
 import CommentsModal from "./CommentModal";
+import AddPostModal from "./addPostModa";
 
 export default function CardPosts() {
   const {
@@ -15,6 +16,7 @@ export default function CardPosts() {
     unLikePost,
   } = usePostStore();
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [isAddPostOpen, setIsAddPostOpen] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -35,6 +37,12 @@ export default function CardPosts() {
     createComment({ postId: Number(postId), content: text });
   };
 
+  const handleCreatePost = (text: string, imageUrl: string) => {
+    // Add your create post logic here
+    console.log("Creating post with text:", text, "and image URL:", imageUrl);
+    setIsAddPostOpen(false); // Close the modal after creating the post
+  };
+
   const handleDeleteComment = (commentId: string) => {
     console.log("Deleting comment:", commentId);
     // Add your delete comment logic here
@@ -43,6 +51,26 @@ export default function CardPosts() {
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        {/* if the user eas mentor or admin show the add post button */}
+        <div className="my-7">
+          <button
+            onClick={() => setIsAddPostOpen(true)}
+            className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg p-4 flex items-center gap-3 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-10 h-10 rounded-full   bg-accent-foreground flex items-center justify-center">
+              <Plus className="w-6 h-6" />
+            </div>
+            <span className="text-gray-400 text-right flex-1 text-xl">
+اضغط هنا لاضافة منشور جديد
+            </span>
+          </button>
+        </div>
+
+        <AddPostModal
+          isOpen={isAddPostOpen}
+          onClose={() => setIsAddPostOpen(false)}
+          onSubmit={handleCreatePost}
+        />
         {posts.map((post) => (
           <div
             key={post.id}

@@ -159,6 +159,8 @@ const usePostStore = create<PostStore>((set, get) => ({
     }
   },
 
+
+  
   async likePost(postId: number) {
     set({ loading: true, error: null });
     try {
