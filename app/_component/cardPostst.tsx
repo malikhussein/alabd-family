@@ -1,8 +1,9 @@
-'use client';
-import { Heart, MessageCircle, Calendar } from 'lucide-react';
-import usePostStore from '../store/post';
-import { useEffect, useState } from 'react';
-import CommentsModal from './CommentModal';
+"use client";
+import { Heart, MessageCircle, Bookmark, Calendar, Plus, ThumbsUp, Share2 } from "lucide-react";
+import usePostStore from "../store/post";
+import { useEffect, useState } from "react";
+import CommentsModal from "./CommentModal";
+import AddPostModal from "./addPostModa";
 
 export default function CardPosts() {
   const {
@@ -15,6 +16,7 @@ export default function CardPosts() {
     unLikePost,
   } = usePostStore();
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const [isAddPostOpen, setIsAddPostOpen] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -35,6 +37,13 @@ export default function CardPosts() {
     createComment({ postId, content: text });
   };
 
+  const handleCreatePost = (text: string, imageUrl: string) => {
+ 
+    console.log("Creating post with text:", text, "and image URL:", imageUrl);
+    setIsAddPostOpen(false); // Close the modal after creating the post
+    
+  };
+
   const handleDeleteComment = (commentId: string) => {
     console.log('Deleting comment:', commentId);
     // Add your delete comment logic here
@@ -43,6 +52,26 @@ export default function CardPosts() {
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        {/* if the user eas mentor or admin show the add post button */}
+        <div className="my-7">
+          <button
+            onClick={() => setIsAddPostOpen(true)}
+            className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg p-4 flex items-center gap-3 transition-all shadow-lg hover:shadow-xl"
+          >
+            <div className="w-10 h-10 rounded-full   bg-accent-foreground flex items-center justify-center">
+              <Plus className="w-6 h-6" />
+            </div>
+            <span className="text-gray-400 text-right flex-1 text-xl">
+اضغط هنا لاضافة منشور جديد
+            </span>
+          </button>
+        </div>
+
+        <AddPostModal
+          isOpen={isAddPostOpen}
+          onClose={() => setIsAddPostOpen(false)}
+          onSubmit={handleCreatePost}
+        />
         {posts.map((post) => (
           <div
             key={post.id}
@@ -73,51 +102,55 @@ export default function CardPosts() {
                 {post.text}
               </p>
 
-              {/* Engagement Section */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-                <div className="flex items-center gap-12">
-                  {/* Comment */}
-                  <button
-                    onClick={() => {
-                      showComments(post.id);
-                      setSelectedPostId(post.id);
-                    }}
-                    className="flex items-center gap-2 text-gray-400 hover:text-blue-500 transition-colors"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="text-sm font-medium">
-                      {/* {post.comments?.length || 0} */}
-                    </span>
-                  </button>
-
-                  {/* likes */}
-                  <button
-                    className={`flex items-center gap-2 
-                      hover:scale-120 transition-all duration-150
-                      ${post.likedByMe == true ? 'text-red-500' : `text-gray-400`}`}
-                    onClick={() => {
-                      if (post.likedByMe == true) {
-                        unLikePost(post.id);
-                      } else {
-                        likePost(post.id);
-                      }
-                    }}
-                  >
-                    <span className="text-sm font-medium">
-                      {post.likesCount}
-                    </span>
-                    <Heart className="w-5 h-5" />
-                  </button>
+              {/* Like Count Display */}
+              {post.likesCount > 0 && (
+                <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
+                  <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500" />
+                  <span>{post.likesCount}</span>
                 </div>
+              )}
 
-                <div className="flex items-center gap-4">
-                  <span className="text-xs text-gray-500 uppercase">
-                    {dateFrmat(post.createdAt)}
-                  </span>
-                  <button className="text-gray-400 hover:text-yellow-500 transition-colors">
-                    <Calendar className="w-5 h-5" />
-                  </button>
-                </div>
+              {/* Engagement Section - Facebook Style */}
+              <div className="flex items-center justify-between gap-2 py-2 border-t border-b border-gray-700">
+                {/* Like Button */}
+                <button
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
+                    ${post.likedByMe 
+                      ? 'text-blue-500' 
+                      : 'text-gray-400'
+                    }`}
+                  onClick={() => {
+                    if (post.likedByMe == true) {
+                      unLikePost(post.id);
+                    } else {
+                      likePost(post.id);
+                    }
+                  }}
+                >
+                  <ThumbsUp className={`w-5 h-5 ${post.likedByMe ? 'fill-blue-500' : ''}`} />
+                  <span className="text-sm font-semibold">أعجبنى</span>
+                </button>
+
+                {/* Comment Button */}
+                <button
+                  onClick={() => {
+                    showComments(post.id);
+                    setSelectedPostId(post.id);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-gray-400 hover:bg-gray-800 transition-all duration-150"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="text-sm font-semibold">تعليق</span>
+                </button>
+
+    
+              </div>
+
+              {/* Date */}
+              <div className="flex items-center justify-end mt-3">
+                <span className="text-xs text-gray-500">
+                  {dateFrmat(post.createdAt)}
+                </span>
               </div>
             </div>
           </div>
