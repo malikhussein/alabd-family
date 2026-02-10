@@ -3,7 +3,7 @@ interface VerifyEmailTemplateProps {
   verificationLink: string;
 }
 
-export function VerifyEmailTemplate({
+export function verifyEmailTemplate({
   userName,
   verificationLink,
 }: VerifyEmailTemplateProps) {
@@ -23,7 +23,7 @@ export function VerifyEmailTemplate({
                 
                 <!-- Header -->
                 <tr>
-                  <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                  <td style="background: linear-gradient(135deg, #424242 0%, #d4af37 100%); padding: 40px 20px; text-align: center;">
                     <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
                       قبيلة آل العبد الحباب
                     </h1>
@@ -44,7 +44,7 @@ export function VerifyEmailTemplate({
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                       <tr>
                         <td align="center">
-                          <a href="${verificationLink}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                          <a href="${verificationLink}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #d4af37 0%, #f2cc55 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;">
                             تحقق من بريدك الإلكتروني
                           </a>
                         </td>
@@ -61,7 +61,7 @@ export function VerifyEmailTemplate({
                     </div>
 
                     <p style="margin: 30px 0 0 0; color: #999999; font-size: 14px; line-height: 1.6; text-align: right;">
-                      <strong>ملاحظة:</strong> هذا الرابط صالح لمدة 24 ساعة فقط. إذا لم تقم بإنشاء هذا الحساب، يمكنك تجاهل هذا البريد الإلكتروني.
+                      <strong>ملاحظة:</strong> هذا الرابط صالح لمدة 15 دقيقة فقط. إذا لم تقم بإنشاء هذا الحساب، يمكنك تجاهل هذا البريد الإلكتروني.
                     </p>
                   </td>
                 </tr>
@@ -73,7 +73,7 @@ export function VerifyEmailTemplate({
                       © 2026 قبيلة آل العبد الحباب. جميع الحقوق محفوظة.
                     </p>
                     <p style="margin: 0; color: #999999; font-size: 12px;">
-                      إذا كان لديك أي استفسار، يرجى التواصل معنا على support@alabd-family.com
+                      إذا كان لديك أي استفسار، يرجى التواصل معنا على <a href="mailto:alalabd505@gmail.com" style="color: #43A6C6">alalabd505@gmail.com</a>
                     </p>
                   </td>
                 </tr>
