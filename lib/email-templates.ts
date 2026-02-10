@@ -142,8 +142,8 @@ export function resetPasswordTemplate({
                     <p style="margin: 20px 0; color: #666666; font-size: 14px; line-height: 1.6; text-align: right;">
                       أو انسخ الرابط التالي والصقه في متصفحك:
                     </p>
-                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; border-right: 4px solid #f5576c; margin: 20px 0; word-break: break-all;">
-                      <a href="${resetLink}" style="color: #f5576c; text-decoration: none; font-size: 14px;">
+                    <div style="background-color: #43A6C6; padding: 15px; border-radius: 6px; border-right: 4px solid #f5576c; margin: 20px 0; word-break: break-all;">
+                      <a href="${resetLink}" style="color: #43A6C6; text-decoration: none; font-size: 14px;">
                         ${resetLink}
                       </a>
                     </div>
