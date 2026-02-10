@@ -5,6 +5,7 @@ import { AuthCode, AuthCodeType } from '../../../../entities/auth-code.entity';
 import { generateCode, generateExpiry } from '../../../../lib/codes';
 import { sendMail } from '../../../../lib/mailer';
 import { requestResetPasswordSchema } from '../../../../lib/validation/auth';
+import { resetPasswordTemplate } from '../../../../lib/email-templates';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -51,15 +52,17 @@ export async function POST(req: Request) {
 
   const resetUrl = `${process.env.APP_URL}`;
 
+  const resetLink = `${resetUrl}/reset-password/${code.code}`;
+
+  const htmlContent = resetPasswordTemplate({
+    userName: user.name,
+    resetLink,
+  });
+
   await sendMail({
     to: user.email,
-    subject: 'Reset your password',
-    html: `<p>You requested a password reset.</p>
-    <p>Use the code below to reset your password:</p>
-    <p><strong>${code.code}</strong></p>
-    <p>Or click the link below:</p>
-    <p><a href="${resetUrl}">${resetUrl}</a></p>
-    <p>This code will expire in 30 minutes.</p>`,
+    subject: 'إعادة تعيين كلمة المرور - قبيلة آل العبد الحباب',
+    html: htmlContent,
   });
 
   return NextResponse.json({ ok: true }, { status: 200 });
