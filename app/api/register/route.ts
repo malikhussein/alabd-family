@@ -6,6 +6,7 @@ import { User, UserRole } from '@/entities/user.entity';
 import { AuthCode, AuthCodeType } from '../../../entities/auth-code.entity';
 import { generateCode, generateExpiry } from '../../../lib/codes';
 import { sendMail } from '../../../lib/mailer';
+import { verifyEmailTemplate } from '../../../lib/email-templates';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -62,14 +63,17 @@ export async function POST(req: Request) {
 
   const verifyUrl = `${process.env.APP_URL}`;
 
+  const verificationLink = `${verifyUrl}/verify-email?code=${verifyCode.code}`;
+
+  const htmlContent = verifyEmailTemplate({
+    userName: user.name,
+    verificationLink,
+  });
+
   await sendMail({
     to: user.email,
-    subject: 'Verify your email address',
-    html: `<p>Welcome to Alabd Family!</p>
-    <p>Verify your email:</p>
-    <p><a href="${verifyUrl}">${verifyUrl}</a></p>
-    <p>Your verification code is: <strong>${verifyCode.code}</strong></p>
-    <p>Expires in 15 minutes.</p>`,
+    subject: 'التحقق من عنوان بريدك الإلكتروني - قبيلة آل العبد الحباب',
+    html: htmlContent,
   });
 
   return NextResponse.json({ ok: true }, { status: 201 });
