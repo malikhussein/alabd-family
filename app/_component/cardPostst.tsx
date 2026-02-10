@@ -1,9 +1,10 @@
-"use client";
-import { Heart, MessageCircle, Bookmark, Calendar, Plus, ThumbsUp, Share2 } from "lucide-react";
-import usePostStore from "../store/post";
-import { useEffect, useState } from "react";
-import CommentsModal from "./CommentModal";
-import AddPostModal from "./addPostModa";
+'use client';
+import Image from 'next/image';
+import { MessageCircle, Plus, ThumbsUp } from 'lucide-react';
+import usePostStore from '../store/post';
+import { useEffect, useState } from 'react';
+import CommentsModal from './CommentModal';
+import AddPostModal from './addPostModa';
 
 export default function CardPosts() {
   const {
@@ -38,10 +39,8 @@ export default function CardPosts() {
   };
 
   const handleCreatePost = (text: string, imageUrl: string) => {
- 
-    console.log("Creating post with text:", text, "and image URL:", imageUrl);
+    console.log('Creating post with text:', text, 'and image URL:', imageUrl);
     setIsAddPostOpen(false); // Close the modal after creating the post
-    
   };
 
   const handleDeleteComment = (commentId: string) => {
@@ -62,7 +61,7 @@ export default function CardPosts() {
               <Plus className="w-6 h-6" />
             </div>
             <span className="text-gray-400 text-right flex-1 text-xl">
-اضغط هنا لاضافة منشور جديد
+              اضغط هنا لاضافة منشور جديد
             </span>
           </button>
         </div>
@@ -70,7 +69,6 @@ export default function CardPosts() {
         <AddPostModal
           isOpen={isAddPostOpen}
           onClose={() => setIsAddPostOpen(false)}
-          onSubmit={handleCreatePost}
         />
         {posts.map((post) => (
           <div
@@ -79,11 +77,13 @@ export default function CardPosts() {
           >
             {/* Image Section */}
             <div className="relative h-100 overflow-hidden">
-              <img
-                src={post?.imageUrl}
+              <Image
+                src={post?.imageUrl || '/default-image.png'}
+                alt={post.text || 'Post Image'}
+                fill
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
               {/* Title Overlay */}
               <div className="absolute bottom-0 right-0 left-0 p-6 text-right">
@@ -115,10 +115,7 @@ export default function CardPosts() {
                 {/* Like Button */}
                 <button
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
-                    ${post.likedByMe 
-                      ? 'text-blue-500' 
-                      : 'text-gray-400'
-                    }`}
+                    ${post.likedByMe ? 'text-blue-500' : 'text-gray-400'}`}
                   onClick={() => {
                     if (post.likedByMe == true) {
                       unLikePost(post.id);
@@ -127,7 +124,9 @@ export default function CardPosts() {
                     }
                   }}
                 >
-                  <ThumbsUp className={`w-5 h-5 ${post.likedByMe ? 'fill-blue-500' : ''}`} />
+                  <ThumbsUp
+                    className={`w-5 h-5 ${post.likedByMe ? 'fill-blue-500' : ''}`}
+                  />
                   <span className="text-sm font-semibold">أعجبنى</span>
                 </button>
 
@@ -142,8 +141,6 @@ export default function CardPosts() {
                   <MessageCircle className="w-5 h-5" />
                   <span className="text-sm font-semibold">تعليق</span>
                 </button>
-
-    
               </div>
 
               {/* Date */}
