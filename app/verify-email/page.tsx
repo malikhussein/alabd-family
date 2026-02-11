@@ -32,7 +32,7 @@ function VerifyContent() {
         const res = await fetch('/api/verify-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: code }),
+          body: JSON.stringify({ code }),
         });
 
         const data = await res.json();
