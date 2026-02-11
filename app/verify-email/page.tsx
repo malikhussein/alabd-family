@@ -1,91 +1,63 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
-function VerifyEmailContent() {
-  const [status, setStatus] = useState<
-    'verifying' | 'success' | 'error' | 'idle'
-  >('idle');
-  const [message, setMessage] = useState('');
-  const [isResending, setIsResending] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-
-  const searchParams = useSearchParams();
+function VerifyContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
-  useEffect(() => {
-    if (token) {
-      verifyEmail(token);
-    }
-  }, [token]);
+  const [state, setState] = useState<{
+    status: 'loading' | 'success' | 'error';
+    message: string;
+  }>({
+    status: 'loading',
+    message: '',
+  });
 
   useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
+    if (!token) {
+      return;
     }
-  }, [countdown]);
 
-  async function verifyEmail(verificationToken: string) {
-    setStatus('verifying');
-    try {
-      const response = await fetch('/api/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: verificationToken }),
-      });
+    const verify = async () => {
+      try {
+        const res = await fetch('/api/verify-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
 
-      const data = await response.json();
+        const data = await res.json();
 
-      if (response.ok) {
-        setStatus('success');
-        setMessage('تم التحقق من بريدك الإلكتروني بنجاح!');
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-      } else {
-        setStatus('error');
-        setMessage(data.error || 'فشل التحقق من البريد الإلكتروني');
+        if (res.ok) {
+          setState({
+            status: 'success',
+            message: 'تم التحقق من بريدك الإلكتروني بنجاح!',
+          });
+
+          setTimeout(() => {
+            router.push('/login');
+          }, 3000);
+        } else {
+          setState({
+            status: 'error',
+            message: data.error || 'فشل التحقق من البريد الإلكتروني',
+          });
+        }
+      } catch (err) {
+        setState({
+          status: 'error',
+          message: 'حدث خطأ أثناء التحقق',
+        });
       }
-    } catch (error) {
-      setStatus('error');
-      setMessage('حدث خطأ أثناء التحقق');
-    }
-  }
+    };
 
-  async function handleResendVerification() {
-    if (countdown > 0) return;
-
-    setIsResending(true);
-    setResendSuccess(false);
-
-    try {
-      const response = await fetch('/api/verify-email/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setResendSuccess(true);
-        setCountdown(60);
-        setMessage('تم إرسال رابط التحقق الجديد إلى بريدك الإلكتروني');
-      } else {
-        setMessage(data.error || 'فشل إرسال رابط التحقق');
-      }
-    } catch (error) {
-      setMessage('حدث خطأ أثناء إرسال رابط التحقق');
-    } finally {
-      setIsResending(false);
-    }
-  }
+    verify();
+  }, [token, router]);
 
   return (
     <div
@@ -95,97 +67,68 @@ function VerifyEmailContent() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl bg-black shadow-xl p-8 space-y-6">
           <div className="text-center space-y-4">
-            {status === 'verifying' && (
+            {!token && state.status === 'loading' && (
+              <>
+                <div className="flex justify-center">
+                  <XCircle className="w-20 h-20 text-red-500" />
+                </div>
+                <h1 className="text-3xl font-bold text-white">فشل التحقق</h1>
+                <p className="text-gray-300">رابط التحقق غير صالح</p>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                  <p className="text-sm text-red-300">
+                    الرجاء المحاولة مرة أخرى أو التواصل مع الدعم
+                  </p>
+                </div>
+              </>
+            )}
+
+            {token && state.status === 'loading' && (
               <>
                 <div className="flex justify-center">
                   <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
                 </div>
                 <h1 className="text-2xl font-bold text-white">
-                  جاري التحقق من بريدك الإلكتروني...
+                  جاري التحقق...
                 </h1>
-                <p className="text-gray-400">
-                  الرجاء الانتظار بينما نتحقق من حسابك
-                </p>
+                <p className="text-gray-400">الرجاء الانتظار</p>
               </>
             )}
 
-            {status === 'success' && (
+            {state.status === 'success' && (
               <>
                 <div className="flex justify-center">
-                  <CheckCircle className="w-16 h-16 text-green-500" />
+                  <CheckCircle className="w-20 h-20 text-green-500" />
                 </div>
-                <h1 className="text-2xl font-bold text-white">
-                  تم التحقق بنجاح!
-                </h1>
-                <p className="text-gray-400">{message}</p>
-                <p className="text-sm text-gray-500">
-                  سيتم توجيهك إلى صفحة تسجيل الدخول...
-                </p>
+                <h1 className="text-3xl font-bold text-white">تم بنجاح! 🎉</h1>
+                <p className="text-gray-300">{state.message}</p>
+                <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                  <p className="text-sm text-green-300">
+                    سيتم توجيهك لتسجيل الدخول خلال 3 ثوانٍ...
+                  </p>
+                </div>
               </>
             )}
 
-            {status === 'error' && (
+            {state.status === 'error' && (
               <>
                 <div className="flex justify-center">
-                  <XCircle className="w-16 h-16 text-red-500" />
+                  <XCircle className="w-20 h-20 text-red-500" />
                 </div>
-                <h1 className="text-2xl font-bold text-white">فشل التحقق</h1>
-                <p className="text-gray-400">{message}</p>
-              </>
-            )}
-
-            {status === 'idle' && !token && (
-              <>
-                <div className="flex justify-center">
-                  <Mail className="w-16 h-16 text-blue-500" />
+                <h1 className="text-3xl font-bold text-white">فشل التحقق</h1>
+                <p className="text-gray-300">{state.message}</p>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                  <p className="text-sm text-red-300">
+                    الرجاء المحاولة مرة أخرى أو التواصل مع الدعم
+                  </p>
                 </div>
-                <h1 className="text-2xl font-bold text-white">
-                  تحقق من بريدك الإلكتروني
-                </h1>
-                <p className="text-gray-400">لم يتم التحقق من حسابك بعد</p>
               </>
             )}
           </div>
 
-          {(status === 'error' || (status === 'idle' && !token)) && (
-            <div className="space-y-4">
-              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
-                <p className="text-sm text-blue-300 text-center">
-                  لم تستلم رابط التحقق؟ يمكنك طلب إرسال رابط جديد
-                </p>
-              </div>
-
-              <Button
-                onClick={handleResendVerification}
-                disabled={isResending || countdown > 0}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isResending ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    جاري الإرسال...
-                  </span>
-                ) : countdown > 0 ? (
-                  `أعد المحاولة بعد ${countdown} ثانية`
-                ) : (
-                  'إرسال رابط تحقق جديد'
-                )}
-              </Button>
-
-              {resendSuccess && (
-                <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
-                  <p className="text-sm text-green-300 text-center">
-                    ✓ تم إرسال رابط التحقق بنجاح
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
           <div className="text-center pt-4 border-t border-gray-700">
             <Link
               href="/login"
-              className="text-blue-400 hover:text-blue-300 font-medium underline text-sm"
+              className="text-blue-400 hover:text-blue-300 font-medium text-sm"
             >
               العودة إلى تسجيل الدخول
             </Link>
@@ -205,7 +148,7 @@ export default function VerifyEmailPage() {
         </div>
       }
     >
-      <VerifyEmailContent />
+      <VerifyContent />
     </Suspense>
   );
 }
