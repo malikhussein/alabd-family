@@ -8,14 +8,10 @@ export default async function NavBar() {
   const session = await auth();
   const user = session?.user.role;
 
-  console.log(user);
-
-  console.log(session);
-
   return (
     <div className="bg-primary/90 o h-14  text-white">
       <ul className="flex justify-center items-center gap-8 h-full font-medium text-xl">
-        {user === 'admin' || user === 'moderator' ? (
+        {user === 'admin' ? (
           <Link href="/dashboard"> لوحة التحكم</Link>
         ) : null}
         <Link href="/about">من نحن</Link>
