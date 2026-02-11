@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, useCallback } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -20,6 +20,10 @@ function VerifyContent() {
 
   useEffect(() => {
     if (!token) {
+      setState({
+        status: 'error',
+        message: 'رابط التحقق غير صالح',
+      });
       return;
     }
 
@@ -67,22 +71,7 @@ function VerifyContent() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl bg-black shadow-xl p-8 space-y-6">
           <div className="text-center space-y-4">
-            {!token && state.status === 'loading' && (
-              <>
-                <div className="flex justify-center">
-                  <XCircle className="w-20 h-20 text-red-500" />
-                </div>
-                <h1 className="text-3xl font-bold text-white">فشل التحقق</h1>
-                <p className="text-gray-300">رابط التحقق غير صالح</p>
-                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-                  <p className="text-sm text-red-300">
-                    الرجاء المحاولة مرة أخرى أو التواصل مع الدعم
-                  </p>
-                </div>
-              </>
-            )}
-
-            {token && state.status === 'loading' && (
+            {state.status === 'loading' && (
               <>
                 <div className="flex justify-center">
                   <Loader2 className="w-16 h-16 text-blue-500 animate-spin" />
