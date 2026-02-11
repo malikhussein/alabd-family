@@ -8,7 +8,7 @@ import Link from 'next/link';
 function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const code = searchParams.get('code');
 
   const [state, setState] = useState<{
     status: 'loading' | 'success' | 'error';
@@ -19,7 +19,7 @@ function VerifyContent() {
   });
 
   useEffect(() => {
-    if (!token) {
+    if (!code) {
       setState({
         status: 'error',
         message: 'رابط التحقق غير صالح',
@@ -32,7 +32,7 @@ function VerifyContent() {
         const res = await fetch('/api/verify-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ token: code }),
         });
 
         const data = await res.json();
@@ -61,7 +61,7 @@ function VerifyContent() {
     };
 
     verify();
-  }, [token, router]);
+  }, [code, router]);
 
   return (
     <div
