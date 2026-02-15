@@ -3,10 +3,11 @@ import React from 'react';
 import Image from 'next/image';
 import useFamilyDataStore from '../store/family-data';
 import banner3Image from '../../public/images/Frame 8.png';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function FamilySection() {
   const { familiesData, fetchFamilyData } = useFamilyDataStore();
+  const router = useRouter();
 
   React.useEffect(() => {
     fetchFamilyData();
@@ -32,7 +33,7 @@ export default function FamilySection() {
           .map((family, index) => (
             <div
               key={family.id || index}
-              onClick={() => redirect(`/family/${family.id}`)}
+              onClick={() => router.push(`/family/${family.id}`)}
               className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
             >
               <div className="relative h-64 md:h-72 lg:h-80">

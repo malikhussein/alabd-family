@@ -49,21 +49,8 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Tribe Divisions Section */}
-      <div className="container mx-auto px-4 py-12 md:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-amber-400 mb-6">
-            أقسام القبيلة وفروعها
-          </h2>
-          <p className="text-base md:text-lg lg:text-3xl leading-relaxed text-gray-200 max-w-4xl mx-auto">
-            هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم
-            بالكرم والشجاعة ونبل الأخلاق
-          </p>
-        </div>
-
-        {/* Cards Grid */}
-        <FamilySection />
-      </div>
+      {/* Family Cards Grid */}
+      <FamilySection />
 
       {/* Sheikhs and Notable Figures Section */}
       <BannersSection />
