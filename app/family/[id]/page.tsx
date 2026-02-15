@@ -57,7 +57,7 @@ export default function FamilyInfo() {
 
   if (loading && !familyData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">جاري التحميل...</p>
@@ -68,7 +68,7 @@ export default function FamilyInfo() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
           <h2 className="text-red-800 font-bold text-xl mb-2">خطأ</h2>
           <p className="text-red-600">{error}</p>
@@ -79,16 +79,16 @@ export default function FamilyInfo() {
 
   if (!familyData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <p className="text-gray-600">لم يتم العثور على بيانات العائلة</p>
+          <p className="text-white">لم يتم العثور على بيانات العائلة</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Banner Image */}
       <div className="relative w-full h-96 md:h-[500px] lg:h-[600px]">
         <Image
@@ -111,7 +111,7 @@ export default function FamilyInfo() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">
               معلومات العائلة
@@ -155,7 +155,7 @@ export default function FamilyInfo() {
             </div>
           ) : familyData.familyInfo && familyData.familyInfo.trim() !== '' ? (
             <div
-              className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap"
+              className="prose max-w-none text-white leading-relaxed whitespace-pre-wrap"
               dir="rtl"
             >
               {familyData.familyInfo}
