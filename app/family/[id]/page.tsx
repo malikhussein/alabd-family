@@ -113,9 +113,6 @@ export default function FamilyInfo() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">
-              معلومات العائلة
-            </h2>
             {canEdit() && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
@@ -161,7 +158,7 @@ export default function FamilyInfo() {
               {familyData.familyInfo}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">
+            <p className="text-white text-center py-8">
               لم يتم إضافة معلومات لهذه العائلة بعد
             </p>
           )}
