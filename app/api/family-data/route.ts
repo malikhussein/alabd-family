@@ -9,6 +9,7 @@ export async function GET() {
 
   const familyData = await familyDataRepo.find({
     select: ['id', 'familyName'],
+    order: { id: 'ASC' },
   });
 
   return NextResponse.json(familyData);
