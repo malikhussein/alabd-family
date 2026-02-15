@@ -6,6 +6,7 @@ import { Post } from '../entities/post.entity';
 import { Like } from '../entities/like.entity';
 import { Comment } from '../entities/comment.entity';
 import { Banner } from '../entities/banner.entity';
+import { FamilyData } from '../entities/family-data.entity';
 
 const globalForDataSource = globalThis as unknown as {
   appDataSource?: DataSource;
@@ -16,7 +17,7 @@ export const AppDataSource =
   new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    entities: [User, AuthCode, Post, Like, Comment, Banner],
+    entities: [User, AuthCode, Post, Like, Comment, Banner, FamilyData],
     synchronize: true, // use migrations later
     logging: true,
   });
