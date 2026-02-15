@@ -1,17 +1,10 @@
 import Image from 'next/image';
-import { auth } from '../auth';
-import { redirect } from 'next/navigation';
 import bannerImage from '../public/images/Frame.png';
 import banner2Image from '../public/images/Frame 12.png';
-import banner3Image from '../public/images/Frame 8.png';
 import BannersSection from './_component/bannersSection';
+import FamilySection from './_component/familySection';
 
 export default async function Home() {
-  const session = await auth();
-  if (!session) {
-    redirect('/login');
-  }
-
   return (
     <div className="min-h-screen  ">
       {/* Hero Banner Section */}
@@ -69,96 +62,7 @@ export default async function Home() {
         </div>
 
         {/* Cards Grid */}
-        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8  mx-auto  ">
-          {/* Card 1 */}
-          <div className="group relative overflow-hidden  shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2  ">
-            <div className="relative h-64 md:h-72 lg:h-80 ">
-              <Image
-                className="object-cover"
-                src={banner3Image}
-                alt="يحيى ابن رشيد ابن العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0  bg-[#B1771F]/65" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  الحاف
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">
-                  ابن غانم ابن العبد
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="group relative overflow-hidden  shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 ">
-            <div className="relative h-64 md:h-72 lg:h-80">
-              <Image
-                className="object-cover"
-                src={banner3Image}
-                alt="برغش ابن راشد ابن العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  برقع
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">
-                  ابن غانم ابن العبد
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="group relative overflow-hidden  shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="relative h-64 md:h-72 lg:h-80">
-              <Image
-                className="object-cover"
-                src={banner3Image}
-                alt="محمد ابن راشد ابن العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0  bg-[#B1771F]/65" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  فايع{' '}
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">
-                  {' '}
-                  ابن رشيد ابن العبد
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4 */}
-          <div className="group relative overflow-hidden  shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="relative h-64 md:h-72 lg:h-80">
-              <Image
-                className="object-cover"
-                src={banner3Image}
-                alt="محمد ابن راشد ابن العبد"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                  محمد
-                </h3>
-                <p className="text-base md:text-lg text-gray-200">
-                  ابن رشيد ابن العبد
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FamilySection />
       </div>
 
       {/* Sheikhs and Notable Figures Section */}
