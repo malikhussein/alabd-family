@@ -137,7 +137,7 @@ export default function SideBar() {
               <div className="flex items-center gap-1">
                 <Heart className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span className="text-yellow-500 text-sm font-medium">
-                  {post.likes}
+                  {post.likesCount}
                 </span>
               </div>
             </div>
