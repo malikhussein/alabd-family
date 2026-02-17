@@ -1,10 +1,10 @@
-'use client';
-import Image from 'next/image';
-import { MessageCircle, Plus, ThumbsUp } from 'lucide-react';
-import usePostStore from '../store/post';
-import { useEffect, useState } from 'react';
-import CommentsModal from './CommentModal';
-import AddPostModal from './addPostModa';
+"use client";
+import Image from "next/image";
+import { CircleOff, MessageCircle, Plus, ThumbsUp } from "lucide-react";
+import usePostStore from "../store/post";
+import { useEffect, useState } from "react";
+import CommentsModal from "./CommentModal";
+import AddPostModal from "./addPostModa";
 
 export default function CardPosts() {
   const {
@@ -25,12 +25,12 @@ export default function CardPosts() {
 
   const dateFrmat = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ar-EG', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      minute: '2-digit',
-      hour: '2-digit',
+    return date.toLocaleDateString("ar-EG", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      minute: "2-digit",
+      hour: "2-digit",
     });
   };
 
@@ -39,12 +39,12 @@ export default function CardPosts() {
   };
 
   const handleCreatePost = (text: string, imageUrl: string) => {
-    console.log('Creating post with text:', text, 'and image URL:', imageUrl);
+    console.log("Creating post with text:", text, "and image URL:", imageUrl);
     setIsAddPostOpen(false); // Close the modal after creating the post
   };
 
   const handleDeleteComment = (commentId: string) => {
-    console.log('Deleting comment:', commentId);
+    console.log("Deleting comment:", commentId);
     // Add your delete comment logic here
   };
 
@@ -77,12 +77,20 @@ export default function CardPosts() {
           >
             {/* Image Section */}
             <div className="relative h-100 overflow-hidden">
-              <Image
-                src={post?.imageUrl || '/default-image.png'}
-                alt={post.text || 'Post Image'}
-                fill
-                className="w-full h-full object-cover"
-              />
+              {post.imageUrl ? (
+                <Image
+                  src={post.imageUrl}
+                  alt={post.text || "Post Image"}
+                  fill
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-700 grid content-center justify-items-center ">
+                  <CircleOff className="text-white" />
+                  <span className="text-white">لا توجد صورة</span>
+                </div>
+              )}
+
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
               {/* Title Overlay */}
@@ -104,32 +112,14 @@ export default function CardPosts() {
 
               {/* Like Count Display */}
               {post.likesCount > 0 && (
-                <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
-                  <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500" />
+                <div className="flex   items-center gap-2 pb-3 text-lg text-gray-400">
+                  <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500 " />
                   <span>{post.likesCount}</span>
                 </div>
               )}
 
               {/* Engagement Section - Facebook Style */}
               <div className="flex items-center justify-between gap-2 py-2 border-t border-b border-gray-700">
-                {/* Like Button */}
-                <button
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
-                    ${post.likedByMe ? 'text-blue-500' : 'text-gray-400'}`}
-                  onClick={() => {
-                    if (post.likedByMe == true) {
-                      unLikePost(post.id);
-                    } else {
-                      likePost(post.id);
-                    }
-                  }}
-                >
-                  <ThumbsUp
-                    className={`w-5 h-5 ${post.likedByMe ? 'fill-blue-500' : ''}`}
-                  />
-                  <span className="text-sm font-semibold">أعجبنى</span>
-                </button>
-
                 {/* Comment Button */}
                 <button
                   onClick={() => {
@@ -140,6 +130,23 @@ export default function CardPosts() {
                 >
                   <MessageCircle className="w-5 h-5" />
                   <span className="text-sm font-semibold">تعليق</span>
+                </button>
+                {/* Like Button */}
+                <button
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
+                    ${post.likedByMe ? "text-blue-500" : "text-gray-400"}`}
+                  onClick={() => {
+                    if (post.likedByMe == true) {
+                      unLikePost(post.id);
+                    } else {
+                      likePost(post.id);
+                    }
+                  }}
+                >
+                  <ThumbsUp
+                    className={`w-5 h-5 ${post.likedByMe ? "fill-blue-500" : ""}`}
+                  />
+                  <span className="text-sm font-semibold">أعجبنى</span>
                 </button>
               </div>
 
