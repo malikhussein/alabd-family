@@ -30,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-card min-h-screen `}
       >
         <SessionProvider>
-          <NavBar />
+          <NavBar isAdmin={false} />
 
           {children}
         </SessionProvider>
