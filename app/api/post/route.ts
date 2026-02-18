@@ -8,6 +8,7 @@ import {
 } from '../../../lib/helpers/auth.helper';
 import { User } from '../../../entities/user.entity';
 import { Like } from '../../../entities/like.entity';
+import { Comment } from '../../../entities/comment.entity';
 import { uploadImageToS3 } from '../../../lib/upload-image';
 
 export async function GET(req: Request) {
@@ -26,6 +27,7 @@ export async function GET(req: Request) {
   const db = await getDb();
   const postRepo = db.getRepository(Post);
   const likeRepo = db.getRepository(Like);
+  const commentRepo = db.getRepository(Comment);
   const userRepo = db.getRepository(User);
 
   const [posts, total] = await postRepo.findAndCount({
@@ -50,6 +52,24 @@ export async function GET(req: Request) {
 
   const likesCountMap = new Map<number, number>(
     rawCounts.map((r: { postId: string; count: string }) => [
+      Number(r.postId),
+      Number(r.count),
+    ]),
+  );
+
+  // commentsCount for page posts (1 query)
+  const rawCommentCounts = postIds.length
+    ? await commentRepo
+        .createQueryBuilder('c')
+        .select(`c."postId"`, 'postId')
+        .addSelect('COUNT(*)', 'count')
+        .where(`c."postId" IN (:...ids)`, { ids: postIds })
+        .groupBy(`c."postId"`)
+        .getRawMany()
+    : [];
+
+  const commentsCountMap = new Map<number, number>(
+    rawCommentCounts.map((r: { postId: string; count: string }) => [
       Number(r.postId),
       Number(r.count),
     ]),
@@ -87,6 +107,7 @@ export async function GET(req: Request) {
     authorId: p.authorId,
     approvedAt: p.approvedAt,
     likesCount: likesCountMap.get(p.id) ?? 0,
+    commentsCount: commentsCountMap.get(p.id) ?? 0,
     likedByMe: likedSet.has(p.id),
   }));
 
