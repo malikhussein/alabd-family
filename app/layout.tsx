@@ -3,6 +3,13 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import NavBar from './_component/navBar';
 import { SessionProvider } from 'next-auth/react';
+import { Amiri } from 'next/font/google'
+const amiri = Amiri({
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-amiri',
+})
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={amiri.variable}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-card min-h-screen `}
       >

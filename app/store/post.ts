@@ -6,6 +6,7 @@ interface Post {
   text: string;
   likesCount: number;
   likedByMe: boolean;
+  commentsCount: number;
   imageUrl?: string;
   createdAt: string;
   author?: {

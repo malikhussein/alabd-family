@@ -15,7 +15,7 @@ export default function NavBarClient({ isAdmin }: NavBarClientProps) {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="bg-primary/90 text-white relative">
+    <nav className="bg-primary/90 text-white font-amiri relative ">
 
   {/* Mobile Navigation */}
       <div className="md:hidden">

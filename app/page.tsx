@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import bannerImage from '../public/images/Frame.png';
 import banner2Image from '../public/images/Frame 12.png';
-import BannersSection from './_component/bannersSection';
-import FamilySection from './_component/familySection';
+ import FamilySection from './_component/familySection';
 
 export default async function Home() {
   return (
@@ -53,10 +52,7 @@ export default async function Home() {
       <FamilySection />
 
       {/* Sheikhs and Notable Figures Section */}
-      <BannersSection />
-
-      {/* Footer Spacing */}
-      <div className="h-12 sm:h-16 md:h-20"></div>
+      {/* <BannersSection /> */}
     </div>
   );
 }
