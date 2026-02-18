@@ -110,13 +110,24 @@ export default function CardPosts() {
                 {post.text}
               </p>
 
-              {/* Like Count Display */}
-              {post.likesCount > 0 && (
-                <div className="flex   items-center gap-2 pb-3 text-lg text-gray-400">
-                  <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500 " />
-                  <span>{post.likesCount}</span>
-                </div>
-              )}
+              <div className="flex items-center justify-start gap-6">
+                {/* Like Count Display */}
+                {post.likesCount > 0 && (
+                  <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
+                    <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500 " />
+                    <span>{post.likesCount}</span>
+                  </div>
+                )}
+
+                {post.commentsCount > 0 && (
+                  <div
+                    className="flex items-center gap-2 pb-3 text-lg text-gray-400"
+                  >
+                    <MessageCircle className="w-5 h-5 fill-blue-500 text-blue-500" />
+                    <span>{post.commentsCount}</span>
+                  </div>
+                )}
+              </div>
 
               {/* Engagement Section - Facebook Style */}
               <div className="flex items-center justify-between gap-2 py-2 border-t border-b border-gray-700">
