@@ -1,12 +1,12 @@
-'use client';
-import { Send, MoreVertical, Trash2, MessageCircle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+"use client";
+import { Send, MoreVertical, Trash2, MessageCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 interface Comment {
   id: string;
@@ -38,7 +38,7 @@ export default function CommentsModal({
   onDeleteComment,
   currentUserId,
 }: CommentsModalProps) {
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const commentsEndRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ export default function CommentsModal({
   }, [isOpen]);
 
   const scrollToBottom = () => {
-    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -62,26 +62,33 @@ export default function CommentsModal({
     if (commentText.trim() && postId !== null) {
       // ← Added null check
       onAddComment(postId, commentText.trim());
-      setCommentText('');
+      setCommentText("");
     }
   };
 
   const formatDate = (date: Date) => {
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const now = new Date(); // This uses YOUR local timezone
+    const createdDate = new Date(date); // Converts UTC string to local time
 
-    if (diffInSeconds < 60) return 'الآن';
-    if (diffInSeconds < 3600)
+    const diffInSeconds = Math.floor(
+      (now.getTime() - createdDate.getTime()) / 1000000, // ✅ Correct!
+    );
+
+    console.log("sda", diffInSeconds);
+    if (diffInSeconds < 60) {
+      return "الآن";
+    } else if (diffInSeconds < 3600) {
       return `منذ ${Math.floor(diffInSeconds / 60)} دقيقة`;
-    if (diffInSeconds < 86400)
+    } else if (diffInSeconds < 86400) {
       return `منذ ${Math.floor(diffInSeconds / 3600)} ساعة`;
-    if (diffInSeconds < 604800)
+    } else if (diffInSeconds < 604800) {
       return `منذ ${Math.floor(diffInSeconds / 86400)} يوم`;
-
-    return date.toLocaleDateString('ar-EG', {
-      month: 'short',
-      day: 'numeric',
-    });
+    } else {
+      return date.toLocaleDateString("ar-EG", {
+        month: "short",
+        day: "numeric",
+      });
+    }
   };
 
   return (
@@ -112,7 +119,7 @@ export default function CommentsModal({
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {comment.user?.name?.charAt(0).toUpperCase() || '؟'}{' '}
+                    {comment.user?.name?.charAt(0).toUpperCase() || "؟"}{" "}
                     {/* ← Added safe navigation */}
                   </div>
                 </div>
@@ -123,7 +130,7 @@ export default function CommentsModal({
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-sm text-white">
-                          {comment.user?.name || 'مستخدم'}{' '}
+                          {comment.user?.name || "مستخدم"}{" "}
                           {/* ← Added fallback */}
                         </span>
                         <span className="text-xs text-gray-500">

@@ -6,11 +6,11 @@ import FamilySection from './_component/familySection';
 
 export default async function Home() {
   return (
-    <div className="min-h-screen  ">
+    <div className="min-h-screen">
       {/* Hero Banner Section */}
-      <div className=" container mx-auto relative w-full h-[300px] md:h-[600px] lg:h-[779px]">
+      <div className="container mx-auto relative w-full h-[250px] sm:h-[400px] md:h-[600px] lg:h-[779px]">
         <Image
-          // className="object-cover"
+          className="object-cover"
           src={bannerImage}
           alt="قبيلة ال العبد الحباب"
           fill
@@ -19,14 +19,14 @@ export default async function Home() {
       </div>
 
       {/* Main Introduction Section */}
-      <div className="container mx-auto px-4 py-12 md:py-20">
-        <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-8 lg:gap-12">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-20">
+        <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-6 sm:gap-8 lg:gap-12">
           {/* Text Content - Right Side */}
           <div className="w-full lg:w-1/2 text-right">
-            <h1 className="text-5xl font-bold mb-6 text-amber-400">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-amber-400">
               قبيلة آل العبد الحباب
             </h1>
-            <p className="text-4xl leading-relaxed text-gray-200">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl leading-relaxed text-gray-200">
               هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم
               بالكرم والشجاعة ونبل الأخلاق، وتمسكت بالعادات العربية الأصيلة
               قولًا وفعلًا، فكان لها حضورها المميز ومكانتها المرموقة بين قبائل
@@ -36,7 +36,7 @@ export default async function Home() {
 
           {/* Image - Left Side */}
           <div className="w-full lg:w-1/3">
-            <div className="relative overflow-hidden shadow-2xl h-[300px] md:h-[500px]">
+            <div className="relative overflow-hidden shadow-2xl h-[250px] sm:h-[350px] md:h-[500px]">
               <Image
                 className="object-cover"
                 src={banner2Image}
@@ -56,7 +56,7 @@ export default async function Home() {
       <BannersSection />
 
       {/* Footer Spacing */}
-      <div className="h-20"></div>
+      <div className="h-12 sm:h-16 md:h-20"></div>
     </div>
   );
 }

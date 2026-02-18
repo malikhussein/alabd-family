@@ -17,7 +17,7 @@ export default function BannersSection() {
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-amber-400 mb-6">
           شيوخها ورجالاتها
         </h2>
-        <p className="text-3xl  leading-relaxed text-gray-200 max-w-4xl mx-auto">
+            <p className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl leading-relaxed text-gray-200">
           هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم بالكرم
           والشجاعة ونبل الأخلاق
         </p>

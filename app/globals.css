@@ -156,7 +156,7 @@
 }
 @layer base {
   body {
-    font-family: "GE SS Family", sans-serif;
+  font-family: "Cairo", sans-serif;
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }

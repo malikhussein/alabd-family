@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { create } from 'zustand';
+import axios from "axios";
+import { create } from "zustand";
 
 interface User {
   id: number;
@@ -27,6 +27,7 @@ interface UserStore {
     keyword?: string,
   ) => Promise<void>;
   toggleRole: (userId: number, newRole: string) => Promise<void>;
+  mostActiveUsers: () => Promise<void>;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
@@ -56,7 +57,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         params.keyword = keyword;
       }
 
-      const { data } = await axios.get('/api/user', { params });
+      const { data } = await axios.get("/api/user", { params });
 
       set({
         users: data.items || [],
@@ -70,7 +71,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : 'Failed to fetch users';
+        : "Failed to fetch users";
 
       set({
         error: errorMessage,
@@ -100,7 +101,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : 'Failed to toggle user role';
+        : "Failed to toggle user role";
 
       set({
         error: errorMessage,
@@ -109,6 +110,30 @@ const useUserStore = create<UserStore>((set, get) => ({
       throw error;
     }
   },
+
+  async mostActiveUsers() {
+    set({ loading: true, error: null });
+    try {
+      const { data } = await axios.get("/api/user/most-active");
+      set({
+        users: data.users || [],
+        metadata: {
+          page: 1,
+          limit: data.users.length,
+          total: data.users.length,
+        },
+        loading: false,
+      });
+    } catch (error) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to fetch most active users";
+      set({ error: errorMessage, users: [], loading: false });
+      throw error;
+    }
+  },
+
+
 }));
 
 export default useUserStore;
