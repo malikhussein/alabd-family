@@ -12,6 +12,7 @@ export default function CardPosts() {
     likePost,
     posts,
     Comment,
+    loading,
     createComment,
     showComments,
     unLikePost,
@@ -179,6 +180,7 @@ export default function CardPosts() {
           onClose={() => setSelectedPostId(null)}
           postId={selectedPostId}
           comments={Comment}
+          loading={loading}
           onAddComment={handleAddComment}
           onDeleteComment={handleDeleteComment}
           currentUserId="current-user-id" // Replace with actual user ID

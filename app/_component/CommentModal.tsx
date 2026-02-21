@@ -23,6 +23,7 @@ interface CommentsModalProps {
   onClose: () => void;
   postId: number | null;
   comments: Comment[];
+  loading: boolean;
   onAddComment: (postId: number, text: string) => void;
   onLikeComment?: (commentId: string) => void;
   onDeleteComment?: (commentId: string) => void;
@@ -37,6 +38,7 @@ export default function CommentsModal({
   onAddComment,
   onDeleteComment,
   currentUserId,
+  loading,
 }: CommentsModalProps) {
   const [commentText, setCommentText] = useState("");
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -100,6 +102,23 @@ export default function CommentsModal({
           </DialogTitle>
         </DialogHeader>
 
+{loading ? (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg, #1c1410 0%, #2d1f0e 50%, #1c1410 100%)" }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <p
+            className="text-amber-400/70 text-lg"
+            style={{ fontFamily: "'Scheherazade New', 'Amiri', serif" }}
+          >
+            جاري التحميل...
+          </p>
+        </div>
+      </div>
+        ) : null  }
+        
         {/* Comments List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(85vh-140px)]">
           {comments.length === 0 ? (
