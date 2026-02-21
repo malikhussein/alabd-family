@@ -241,7 +241,7 @@ const usePostStore = create<PostStore>((set, get) => ({
           updatedAt: new Date(comment.updatedAt),
         }),
       );
-      set({ loading: false, Comment: comments });
+    set({ loading: false, Comment: comments });
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message

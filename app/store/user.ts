@@ -133,6 +133,21 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
+  // Needt to Refactor this function to update the user in the local state instead of refetching all users
+  async updateProfilePicture (  userId: number, imageUrl: string) {
+    set({ loading: true, error: null });
+    const response = await axios.post(`/api/user/me/profile-picture`, {
+      imageUrl,
+    });
+    const updatedUser = response.data;
+    const { users } = get();
+    set({
+      users: users.map((user) =>
+        user.id === userId ? { ...user, profileImageUrl: updatedUser.profileImageUrl } : user,
+      ),
+      loading: false,
+    });
+  }
 
 }));
 
