@@ -27,6 +27,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
+
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -37,7 +38,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-card min-h-screen `}
       >
         <SessionProvider>
-          <NavBar isAdmin={false}  />
+          <NavBar   />
 
           {children}
         </SessionProvider>

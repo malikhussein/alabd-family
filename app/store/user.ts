@@ -14,7 +14,9 @@ interface User {
 interface UserStore {
   users: User[];
   loading: boolean;
+
   error: string | null;
+  myData: User | null;
   metadata: {
     page: number;
     limit: number;
@@ -28,12 +30,14 @@ interface UserStore {
   ) => Promise<void>;
   toggleRole: (userId: number, newRole: string) => Promise<void>;
   mostActiveUsers: () => Promise<void>;
+  updateProfilePicture: (fileImage: File) => Promise<void>;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
   users: [],
   loading: false,
   error: null,
+  myData: null,
   metadata: {
     page: 0,
     limit: 10,
@@ -78,6 +82,22 @@ const useUserStore = create<UserStore>((set, get) => ({
         users: [],
         loading: false,
       });
+      throw error;
+    }
+  },
+
+  async getMe() {
+    try {
+      set({ loading: true, error: null });
+      const { data } = await axios.get("/api/user/me");
+      console.log(data);
+
+      set({ myData: data.user, loading: false });
+    } catch (error) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to fetch user data";
+      set({ error: errorMessage, myData: null, loading: false });
       throw error;
     }
   },
@@ -134,21 +154,32 @@ const useUserStore = create<UserStore>((set, get) => ({
   },
 
   // Needt to Refactor this function to update the user in the local state instead of refetching all users
-  async updateProfilePicture (  userId: number, imageUrl: string) {
-    set({ loading: true, error: null });
-    const response = await axios.post(`/api/user/me/profile-picture`, {
-      imageUrl,
-    });
-    const updatedUser = response.data;
-    const { users } = get();
-    set({
-      users: users.map((user) =>
-        user.id === userId ? { ...user, profileImageUrl: updatedUser.profileImageUrl } : user,
-      ),
-      loading: false,
-    });
-  }
+  async updateProfilePicture(fileImage: File) {
+    try {
+      set({ loading: true, error: null });
+      const formData = new FormData();
+      formData.append("file", fileImage);
 
+      const { data } = await axios.post(
+        `/api/user/me/profile-picture`,
+        formData,
+      ); // no headers
+
+      const { myData } = get();
+      set({
+        myData: myData
+          ? { ...myData, profileImageUrl: data.profileImageUrl }
+          : null,
+        loading: false,
+      });
+    } catch (error) {
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to update profile picture";
+      set({ error: errorMessage, loading: false });
+      throw error;
+    }
+  },
 }));
 
 export default useUserStore;

@@ -6,13 +6,11 @@ import { Menu, UserRoundPen, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 
-interface NavBarClientProps {
-  isAdmin: boolean;
-}
-
-export default function NavBarClient({ isAdmin }: NavBarClientProps) {
+export default function NavBarClient() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session } = useSession();
+
+  const role = session?.user?.role || "user";
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -87,7 +85,7 @@ export default function NavBarClient({ isAdmin }: NavBarClientProps) {
                   <Link href="/login">قم بتسجيل الدخول</Link>
                 </li>
               )}
-              {isAdmin && (
+              {role == "admin" && (
                 <li>
                   <Link
                     href="/dashboard"
@@ -138,14 +136,24 @@ export default function NavBarClient({ isAdmin }: NavBarClientProps) {
           </Link>
         </li>
 
-        {/* <li>
+        {role == "admin" && (
+          <li>
+            <Link
+              href="/dashboard"
+              className="  hover:text-amber-400 transition-colors"
+            >
+              لوحة التحكم
+            </Link>
+          </li>
+        )}
+        <li>
           <Link
             href="/profile"
             className="hover:text-amber-400 transition-colors"
           >
-            <UserRoundPen />
+            البروفايل
           </Link>
-        </li> */}
+        </li>
 
         {session ? (
           <li>
@@ -160,16 +168,6 @@ export default function NavBarClient({ isAdmin }: NavBarClientProps) {
           <Button className=" bg-white text-primary hover:bg-amber-400 hover:text-white transition-colors text-lg font-semibold">
             <Link href="/login">قم بتسجيل الدخول</Link>
           </Button>
-        )}
-        {isAdmin && (
-          <li>
-            <Link
-              href="/dashboard"
-              className="  hover:text-amber-400 transition-colors"
-            >
-              لوحة التحكم
-            </Link>
-          </li>
         )}
       </ul>
     </nav>
