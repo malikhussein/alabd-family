@@ -1,5 +1,5 @@
-import axios from "axios";
-import { create } from "zustand";
+import axios from 'axios';
+import { create } from 'zustand';
 
 interface User {
   id: number;
@@ -31,6 +31,7 @@ interface UserStore {
   toggleRole: (userId: number, newRole: string) => Promise<void>;
   mostActiveUsers: () => Promise<void>;
   updateProfilePicture: (fileImage: File) => Promise<void>;
+  getMe: () => Promise<void>;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
@@ -61,7 +62,7 @@ const useUserStore = create<UserStore>((set, get) => ({
         params.keyword = keyword;
       }
 
-      const { data } = await axios.get("/api/user", { params });
+      const { data } = await axios.get('/api/user', { params });
 
       set({
         users: data.items || [],
@@ -75,7 +76,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch users";
+        : 'Failed to fetch users';
 
       set({
         error: errorMessage,
@@ -89,14 +90,14 @@ const useUserStore = create<UserStore>((set, get) => ({
   async getMe() {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.get("/api/user/me");
+      const { data } = await axios.get('/api/user/me');
       console.log(data);
 
       set({ myData: data.user, loading: false });
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch user data";
+        : 'Failed to fetch user data';
       set({ error: errorMessage, myData: null, loading: false });
       throw error;
     }
@@ -121,7 +122,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to toggle user role";
+        : 'Failed to toggle user role';
 
       set({
         error: errorMessage,
@@ -134,7 +135,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   async mostActiveUsers() {
     set({ loading: true, error: null });
     try {
-      const { data } = await axios.get("/api/user/most-active");
+      const { data } = await axios.get('/api/user/most-active');
       set({
         users: data.users || [],
         metadata: {
@@ -147,7 +148,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to fetch most active users";
+        : 'Failed to fetch most active users';
       set({ error: errorMessage, users: [], loading: false });
       throw error;
     }
@@ -158,7 +159,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const formData = new FormData();
-      formData.append("file", fileImage);
+      formData.append('file', fileImage);
 
       const { data } = await axios.post(
         `/api/user/me/profile-picture`,
@@ -175,7 +176,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
-        : "Failed to update profile picture";
+        : 'Failed to update profile picture';
       set({ error: errorMessage, loading: false });
       throw error;
     }
