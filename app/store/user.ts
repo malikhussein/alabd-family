@@ -30,6 +30,7 @@ interface UserStore {
   ) => Promise<void>;
   toggleRole: (userId: number, newRole: string) => Promise<void>;
   mostActiveUsers: () => Promise<void>;
+  getMe: () => Promise<void>;
   updateProfilePicture: (fileImage: File) => Promise<void>;
   getMe: () => Promise<void>;
 }
