@@ -32,7 +32,6 @@ interface UserStore {
   mostActiveUsers: () => Promise<void>;
   getMe: () => Promise<void>;
   updateProfilePicture: (fileImage: File) => Promise<void>;
-  getMe: () => Promise<void>;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
