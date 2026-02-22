@@ -5,6 +5,13 @@ import usePostStore from "../store/post";
 import { useEffect, useState } from "react";
 import CommentsModal from "./CommentModal";
 import AddPostModal from "./addPostModa";
+import { useSession } from "next-auth/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function CardPosts() {
   const {
@@ -17,8 +24,15 @@ export default function CardPosts() {
     showComments,
     unLikePost,
   } = usePostStore();
+  const { data: session } = useSession();
+  console.log(session);
+
+  const userRole = session?.user?.role as string | undefined;
+  console.log(userRole);
+
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [isAddPostOpen, setIsAddPostOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -53,19 +67,21 @@ export default function CardPosts() {
     <>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* if the user eas mentor or admin show the add post button */}
-        <div className="my-7">
-          <button
-            onClick={() => setIsAddPostOpen(true)}
-            className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg p-4 flex items-center gap-3 transition-all shadow-lg hover:shadow-xl"
-          >
-            <div className="w-10 h-10 rounded-full   bg-accent-foreground flex items-center justify-center">
-              <Plus className="w-6 h-6" />
-            </div>
-            <span className="text-gray-400 text-right flex-1 text-xl">
-              اضغط هنا لاضافة منشور جديد
-            </span>
-          </button>
-        </div>
+        {userRole && (userRole === "mentor" || userRole === "admin") && (
+          <div className="my-7">
+            <button
+              onClick={() => setIsAddPostOpen(true)}
+              className="w-full bg-gray-800 hover:bg-gray-700 text-white rounded-lg p-4 flex items-center gap-3 transition-all shadow-lg hover:shadow-xl"
+            >
+              <div className="w-10 h-10 rounded-full   bg-accent-foreground flex items-center justify-center">
+                <Plus className="w-6 h-6" />
+              </div>
+              <span className="text-gray-400 text-right flex-1 text-xl">
+                اضغط هنا لاضافة منشور جديد
+              </span>
+            </button>
+          </div>
+        )}
 
         <AddPostModal
           isOpen={isAddPostOpen}
@@ -121,9 +137,7 @@ export default function CardPosts() {
                 )}
 
                 {post.commentsCount > 0 && (
-                  <div
-                    className="flex items-center gap-2 pb-3 text-lg text-gray-400"
-                  >
+                  <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
                     <MessageCircle className="w-5 h-5 fill-blue-500 text-blue-500" />
                     <span>{post.commentsCount}</span>
                   </div>
@@ -135,8 +149,12 @@ export default function CardPosts() {
                 {/* Comment Button */}
                 <button
                   onClick={() => {
-                    showComments(post.id);
-                    setSelectedPostId(post.id);
+                    if (!session) {
+                      setShowLoginModal(true);
+                    } else {
+                      showComments(post.id);
+                      setSelectedPostId(post.id);
+                    }
                   }}
                   className="flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-gray-400 hover:bg-gray-800 transition-all duration-150"
                 >
@@ -148,10 +166,14 @@ export default function CardPosts() {
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
                     ${post.likedByMe ? "text-blue-500" : "text-gray-400"}`}
                   onClick={() => {
-                    if (post.likedByMe == true) {
-                      unLikePost(post.id);
+                    if (!session) {
+                      setShowLoginModal(true);
                     } else {
-                      likePost(post.id);
+                      if (post.likedByMe == true) {
+                        unLikePost(post.id);
+                      } else {
+                        likePost(post.id);
+                      }
                     }
                   }}
                 >
@@ -186,6 +208,41 @@ export default function CardPosts() {
           currentUserId="current-user-id" // Replace with actual user ID
         />
       )}
+
+      {/* Login Required Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="sm:max-w-[500px] bg-gray-900 border border-gray-700 rounded-lg">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center text-xl">
+              تسجيل الدخول مطلوب
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center gap-4 py-6">
+            <div className="text-center">
+              <p className="text-gray-300 text-lg mb-2">
+                يجب عليك تسجيل الدخول أولاً
+              </p>
+              <p className="text-gray-400 text-sm">
+                لتتمكن من الإعجاب والتعليق على المنشورات
+              </p>
+            </div>
+            <div className="flex gap-3 w-full mt-4">
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="flex-1 px-4 py-2 rounded-md border border-gray-600 text-gray-300 hover:bg-gray-800 transition-all"
+              >
+                إغلاق
+              </button>
+              <a
+                href="/login"
+                className="flex-1 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-all text-center font-semibold"
+              >
+                تسجيل الدخول
+              </a>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
