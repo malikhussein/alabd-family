@@ -151,7 +151,7 @@ export default function NavBarClient() {
             href="/profile"
             className="hover:text-amber-400 transition-colors"
           >
-            البروفايل
+            <UserRoundPen/>
           </Link>
         </li>
 
