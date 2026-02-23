@@ -39,7 +39,7 @@ interface PostStore {
     total: number;
   };
   fetchPendingPosts: (page?: number, limit?: number) => Promise<void>;
-  fetchPosts: () => Promise<void>;
+  fetchPosts: (page?:number,limit?:number) => Promise<void>;
   approvePost: (postId: number) => Promise<void>;
   rejectPost: (postId: number) => Promise<void>;
   likePost: (postId: number) => Promise<void>;
@@ -93,7 +93,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     }
   },
 
-  async fetchPosts(page = 1, limit = 10) {
+  async fetchPosts(page , limit) {
     set({ loading: true, error: null });
     try {
       const { data } = await axios.get("/api/post", {

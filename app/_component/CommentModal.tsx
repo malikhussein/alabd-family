@@ -68,31 +68,29 @@ export default function CommentsModal({
     }
   };
 
-  const formatDate = (date: Date) => {
-    const now = new Date(); // This uses YOUR local timezone
-    const createdDate = new Date(date); // Converts UTC string to local time
+const formatDate = (date: string | Date) => {
+  const now = new Date();
+  const createdDate = new Date(date);
 
-    const diffInSeconds = Math.floor(
-      (now.getTime() - createdDate.getTime()) / 1000000, // ✅ Correct!
-    );
+  const diffInSeconds = Math.floor(
+    (now.getTime() - createdDate.getTime()) / 1000,
+  );
 
-    console.log("sda", diffInSeconds);
-    if (diffInSeconds < 60) {
-      return "الآن";
-    } else if (diffInSeconds < 3600) {
-      return `منذ ${Math.floor(diffInSeconds / 60)} دقيقة`;
-    } else if (diffInSeconds < 86400) {
-      return `منذ ${Math.floor(diffInSeconds / 3600)} ساعة`;
-    } else if (diffInSeconds < 604800) {
-      return `منذ ${Math.floor(diffInSeconds / 86400)} يوم`;
-    } else {
-      return date.toLocaleDateString("ar-EG", {
-        month: "short",
-        day: "numeric",
-      });
-    }
-  };
-
+  if (diffInSeconds < 60) {
+    return "الآن";
+  } else if (diffInSeconds < 3600) {
+    return `منذ ${Math.floor(diffInSeconds / 60)} دقيقة`;
+  } else if (diffInSeconds < 86400) {
+    return `منذ ${Math.floor(diffInSeconds / 3600)} ساعة`;
+  } else if (diffInSeconds < 604800) {
+    return `منذ ${Math.floor(diffInSeconds / 86400)} يوم`;
+  } else {
+    return createdDate.toLocaleDateString("ar-EG", {
+      month: "short",
+      day: "numeric",
+    });
+  }
+};
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 gap-0 bg-gray-900 border-gray-800">
@@ -105,12 +103,11 @@ export default function CommentsModal({
 {loading ? (
       <div
         className="min-h-screen flex items-center justify-center"
-        style={{ background: "linear-gradient(135deg, #1c1410 0%, #2d1f0e 50%, #1c1410 100%)" }}
-      >
+       >
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
           <p
-            className="text-amber-400/70 text-lg"
+            className="text-white text-lg"
             style={{ fontFamily: "'Scheherazade New', 'Amiri', serif" }}
           >
             جاري التحميل...
