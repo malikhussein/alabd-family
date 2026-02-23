@@ -90,36 +90,20 @@ export default function CardPosts() {
         {posts.map((post) => (
           <div
             key={post.id}
-            className="bg-card rounded-lg overflow-hidden shadow-xl mb-4 hover:shadow-2xl transition-all duration-300 hover:scale-103"
+            className="bg-gray-900 rounded-lg overflow-hidden shadow-xl mb-4 hover:shadow-2xl transition-all duration-300 hover:scale-103 "
           >
-            {/* Image Section */}
-            <div className="relative h-100 overflow-hidden">
-              {post.imageUrl ? (
-                <Image
-                  src={post.imageUrl}
-                  alt={post.text || "Post Image"}
-                  fill
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-700 grid content-center justify-items-center ">
-                  <CircleOff className="text-white" />
-                  <span className="text-white">لا توجد صورة</span>
-                </div>
-              )}
-
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-
-              {/* Title Overlay */}
-              <div className="absolute bottom-0 right-0 left-0 p-6 text-right">
-                <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
-                  {/* {post.title} */}
-                </h2>
-                <p className="text-sm text-gray-200 drop-shadow-md">
-                  {/* {post.subtitle} */}
-                </p>
-              </div>
-            </div>
+        {/* Image Section */}
+        {post.imageUrl ? (
+          <div className="relative h-100 overflow-hidden">
+            <Image
+              src={post.imageUrl}
+              alt={post.text || "Post Image"}
+              fill
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+          </div>
+        ) : null}
 
             {/* Content Section */}
             <div className="p-6">
@@ -190,6 +174,7 @@ export default function CardPosts() {
                   {dateFrmat(post.createdAt)}
                 </span>
               </div>
+
             </div>
           </div>
         ))}

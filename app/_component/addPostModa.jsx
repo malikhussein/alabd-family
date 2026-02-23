@@ -44,7 +44,7 @@ export default function AddPostModal({ isOpen, onClose }) {
     const formData = new FormData();
     formData.append("text", postText);
     if (selectedImage) {
-      formData.append("image", selectedImage);
+      formData.append("file", selectedImage);
     }
 
     try {
@@ -129,12 +129,7 @@ export default function AddPostModal({ isOpen, onClose }) {
               >
                 <Image className="w-6 h-6 text-green-500 group-hover:scale-110 transition-transform" />
               </button>
-              <button
-                className="p-2 hover:bg-gray-800 rounded-full transition-all group"
-                title="شعور/نشاط"
-              >
-                <Smile className="w-6 h-6 text-yellow-500 group-hover:scale-110 transition-transform" />
-              </button>
+         
             </div>
             <span className="text-white font-medium text-sm">
               أضف إلى منشورك

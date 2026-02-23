@@ -12,7 +12,8 @@ export default function SideBar() {
   const { users, mostActiveUsers } = useUserStore();
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts( 1,5);
+
     mostActiveUsers();
   }, [fetchPosts, mostActiveUsers]);
 
@@ -113,7 +114,7 @@ export default function SideBar() {
         <div className="space-y-4">
           {posts.map((post) => (
             <div
-              key={post.id}
+              key={post.id} 
               className="flex items-center gap-3 group cursor-pointer"
             >
               <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden">
