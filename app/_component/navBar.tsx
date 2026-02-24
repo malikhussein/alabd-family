@@ -147,12 +147,14 @@ export default function NavBarClient() {
           </li>
         )}
         <li>
+           {session && (
           <Link
             href="/profile"
             className="hover:text-amber-400 transition-colors"
           >
             <UserRoundPen/>
           </Link>
+          )}
         </li>
 
         {session ? (
