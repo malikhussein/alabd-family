@@ -10,6 +10,7 @@ import { User } from '../../../entities/user.entity';
 import { Like } from '../../../entities/like.entity';
 import { Comment } from '../../../entities/comment.entity';
 import { uploadImageToS3 } from '../../../lib/upload-image';
+import { auth } from '@/auth';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -35,6 +36,7 @@ export async function GET(req: Request) {
     order: { createdAt: 'DESC' },
     skip,
     take: limit,
+    relations: { author: true },  
   });
 
   const postIds = posts.map((item) => item.id);
@@ -105,6 +107,7 @@ export async function GET(req: Request) {
     imageUrl: p.imageUrl,
     status: p.status,
     authorId: p.authorId,
+    author: p.author,
     approvedAt: p.approvedAt,
     likesCount: likesCountMap.get(p.id) ?? 0,
     commentsCount: commentsCountMap.get(p.id) ?? 0,

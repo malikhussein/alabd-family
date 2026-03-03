@@ -29,7 +29,7 @@ export default function Page() {
       {/* Content */}
       <div className="mt-12 space-y-6">
         <h3 className="text-xl md:text-2xl lg:text-5xl font-bold text-primary text-right">
-          قبيلة ال العبد الحباب
+          قبيلة آل العبد الحباب
         </h3>
         <p className=" text-lg md:text-xl lg:text-2xl text-white text-right leading-6 whitespace-pre-wrap">
           {`

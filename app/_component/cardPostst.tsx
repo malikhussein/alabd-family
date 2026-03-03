@@ -1,6 +1,13 @@
 "use client";
 import Image from "next/image";
-import { CircleOff, MessageCircle, Plus, ThumbsUp } from "lucide-react";
+import {
+  CircleOff,
+  MessageCircle,
+  Plus,
+  ThumbsUp,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import usePostStore from "../store/post";
 import { useEffect, useState } from "react";
 import CommentsModal from "./CommentModal";
@@ -23,6 +30,7 @@ export default function CardPosts() {
     createComment,
     showComments,
     unLikePost,
+    metadata,
   } = usePostStore();
   const { data: session } = useSession();
   console.log(session);
@@ -33,10 +41,12 @@ export default function CardPosts() {
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [isAddPostOpen, setIsAddPostOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(10);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(currentPage, limit);
+  }, [currentPage, limit, fetchPosts]);
 
   const dateFrmat = (dateString: string) => {
     const date = new Date(dateString);
@@ -63,11 +73,15 @@ export default function CardPosts() {
     // Add your delete comment logic here
   };
 
+  const totalPages   = Math.ceil(metadata.total / metadata.limit);
+  const hasNextPage  = currentPage < totalPages;
+  const hasPrevPage  = currentPage > 1;
+
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* if the user eas mentor or admin show the add post button */}
-        {userRole && (userRole === "mentor" || userRole === "admin") && (
+        {userRole && (userRole === "moderator" || userRole === "admin") && (
           <div className="my-7">
             <button
               onClick={() => setIsAddPostOpen(true)}
@@ -87,97 +101,154 @@ export default function CardPosts() {
           isOpen={isAddPostOpen}
           onClose={() => setIsAddPostOpen(false)}
         />
-        {posts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-gray-900 rounded-lg overflow-hidden shadow-xl mb-4 hover:shadow-2xl transition-all duration-300 hover:scale-103 "
-          >
-        {/* Image Section */}
-        {post.imageUrl ? (
-          <div className="relative h-100 overflow-hidden">
-            <Image
-              src={post.imageUrl}
-              alt={post.text || "Post Image"}
-              fill
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-          </div>
-        ) : null}
+        {posts.length > 0 ? (
+          <>
+            {posts.map((post) => (
+              <div
+                key={post.id}
+                className="bg-gray-900 rounded-lg overflow-hidden shadow-xl mb-4 hover:shadow-2xl transition-all duration-300 hover:scale-103 "
+              >
+                <div className="p-6">
+                  <p className="text-gray-300 text-lg leading-relaxed text-right mb-6">
+                    {post.text}
+                  </p>
+                  {/* Image Section */}
+                  {post.imageUrl ? (
+                    <div className="relative h-100 overflow-hidden">
+                      <Image
+                        src={post.imageUrl}
+                        alt={post.text || "Post Image"}
+                        fill
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+                    </div>
+                  ) : null}
 
-            {/* Content Section */}
-            <div className="p-6">
-              <p className="text-gray-300 text-sm leading-relaxed text-right mb-6">
-                {post.text}
-              </p>
+                  {/* Content Section */}
 
-              <div className="flex items-center justify-start gap-6">
-                {/* Like Count Display */}
-                {post.likesCount > 0 && (
-                  <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
-                    <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500 " />
-                    <span>{post.likesCount}</span>
+                  <div
+                    className="flex items-center justify-between gap-6 mt-4 "
+                    dir="rtl"
+                  >
+                    {/* Like Count Display */}
+                    {post.likesCount > 0 && (
+                      <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
+                        <ThumbsUp className="w-5 h-5 fill-blue-500 text-blue-500 " />
+                        <span>{post.likesCount}</span>
+                      </div>
+                    )}
+
+                    {post.commentsCount > 0 && (
+                      <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
+                        <MessageCircle className="w-5 h-5 fill-blue-500 text-blue-500" />
+                        <span>{post.commentsCount}</span>
+                      </div>
+                    )}
                   </div>
-                )}
 
-                {post.commentsCount > 0 && (
-                  <div className="flex items-center gap-2 pb-3 text-lg text-gray-400">
-                    <MessageCircle className="w-5 h-5 fill-blue-500 text-blue-500" />
-                    <span>{post.commentsCount}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Engagement Section - Facebook Style */}
-              <div className="flex items-center justify-between gap-2 py-2 border-t border-b border-gray-700">
-                {/* Comment Button */}
-                <button
-                  onClick={() => {
-                    if (!session) {
-                      setShowLoginModal(true);
-                    } else {
-                      showComments(post.id);
-                      setSelectedPostId(post.id);
-                    }
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-gray-400 hover:bg-gray-800 transition-all duration-150"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  <span className="text-sm font-semibold">تعليق</span>
-                </button>
-                {/* Like Button */}
-                <button
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
+                  {/* Engagement Section - Facebook Style */}
+                  <div className="flex items-center justify-between gap-2 py-2 border-t border-b border-gray-700">
+                    {/* Comment Button */}
+                    <button
+                      onClick={() => {
+                        if (!session) {
+                          setShowLoginModal(true);
+                        } else {
+                          showComments(post.id);
+                          setSelectedPostId(post.id);
+                        }
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-gray-400 hover:bg-gray-800 transition-all duration-150"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      <span className="text-sm font-semibold">تعليق</span>
+                    </button>
+                    {/* Like Button */}
+                    <button
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md transition-all duration-150 hover:bg-gray-800
                     ${post.likedByMe ? "text-blue-500" : "text-gray-400"}`}
-                  onClick={() => {
-                    if (!session) {
-                      setShowLoginModal(true);
-                    } else {
-                      if (post.likedByMe == true) {
-                        unLikePost(post.id);
-                      } else {
-                        likePost(post.id);
-                      }
-                    }
-                  }}
-                >
-                  <ThumbsUp
-                    className={`w-5 h-5 ${post.likedByMe ? "fill-blue-500" : ""}`}
-                  />
-                  <span className="text-sm font-semibold">أعجبنى</span>
-                </button>
-              </div>
+                      onClick={() => {
+                        if (!session) {
+                          setShowLoginModal(true);
+                        } else {
+                          if (post.likedByMe == true) {
+                            unLikePost(post.id);
+                          } else {
+                            likePost(post.id);
+                          }
+                        }
+                      }}
+                    >
+                      <ThumbsUp
+                        className={`w-5 h-5 ${post.likedByMe ? "fill-blue-500" : ""}`}
+                      />
+                      <span className="text-sm font-semibold">أعجبنى</span>
+                    </button>
+                  </div>
 
-              {/* Date */}
-              <div className="flex items-center justify-end mt-3">
-                <span className="text-xs text-gray-500">
-                  {dateFrmat(post.createdAt)}
+                  {/* Date */}
+                  <div className="flex items-center justify-end mt-3">
+                    <span className="text-md text-gray-500">
+                      {dateFrmat(post.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between gap-4 mt-8 p-4 bg-gray-800 rounded-lg">
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={!hasPrevPage}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
+                  hasPrevPage
+                    ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                    : "bg-gray-700 text-gray-500 cursor-not-allowed opacity-50"
+                }`}
+              >
+                <ChevronRight className="w-5 h-5" />
+                <span>السابق</span>
+              </button>
+
+              <div className="flex items-center gap-2 text-gray-300">
+                <span className="text-sm">
+                  صفحة{" "}
+                  <span className="font-semibold text-white">
+                    {currentPage}
+                  </span>{" "}
+                  من{" "}
+                  <span className="font-semibold text-white">{totalPages}</span>
+                </span>
+                <span className="text-gray-500">•</span>
+                <span className="text-sm">
+                  إجمالي المنشورات:{" "}
+                  <span className="font-semibold text-white">
+                    {metadata.total}
+                  </span>
                 </span>
               </div>
 
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={!hasNextPage}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-all ${
+                  hasNextPage
+                    ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                    : "bg-gray-700 text-gray-500 cursor-not-allowed opacity-50"
+                }`}
+              >
+                <span>التالي</span>
+                <ChevronLeft className="w-5 h-5" />
+              </button>
             </div>
+          </>
+        ) : (
+          <div className="text-center py-12 bg-gray-800 rounded-lg">
+            <p className="text-gray-400 text-lg">لا توجد منشورات متاحة</p>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Comments Modal */}

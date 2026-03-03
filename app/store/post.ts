@@ -33,13 +33,18 @@ interface PostStore {
   pendingPosts: Post[];
   error: string | null;
   loading: boolean;
+  metadata: {
+    page: number;
+    limit: number;
+    total: number;
+  };
   pendingMetadata: {
     page: number;
     limit: number;
     total: number;
   };
   fetchPendingPosts: (page?: number, limit?: number) => Promise<void>;
-  fetchPosts: (page?:number,limit?:number) => Promise<void>;
+  fetchPosts: (page?: number, limit?: number) => Promise<void>;
   approvePost: (postId: number) => Promise<void>;
   rejectPost: (postId: number) => Promise<void>;
   likePost: (postId: number) => Promise<void>;
@@ -55,6 +60,11 @@ const usePostStore = create<PostStore>((set, get) => ({
   pendingPosts: [],
   error: null,
   loading: false,
+  metadata: {
+    page: 1,
+    limit: 10,
+    total: 0,
+  },
   pendingMetadata: {
     page: 0,
     limit: 10,
@@ -93,7 +103,7 @@ const usePostStore = create<PostStore>((set, get) => ({
     }
   },
 
-  async fetchPosts(page , limit) {
+  async fetchPosts(page, limit) {
     set({ loading: true, error: null });
     try {
       const { data } = await axios.get("/api/post", {
@@ -101,7 +111,15 @@ const usePostStore = create<PostStore>((set, get) => ({
       });
       console.log(data);
 
-      set({ posts: data.items, loading: false });
+      set({
+        posts: data.items,
+        metadata: {
+          page: data.page,
+          limit: data.limit,
+          total: data.total,
+        },
+        loading: false,
+      });
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
@@ -241,7 +259,7 @@ const usePostStore = create<PostStore>((set, get) => ({
           updatedAt: new Date(comment.updatedAt),
         }),
       );
-    set({ loading: false, Comment: comments });
+      set({ loading: false, Comment: comments });
     } catch (error) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
