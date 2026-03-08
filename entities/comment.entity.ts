@@ -7,8 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Post } from './post.entity';
-import { User } from './user.entity';
 
 @Index('IDX_comment_post', ['postId'])
 @Index('IDX_comment_user', ['userId'])
@@ -34,3 +32,6 @@ export class Comment extends BaseEntity {
   @Column({ type: 'text' })
   content!: string;
 }
+
+import { Post } from './post.entity';
+import { User } from './user.entity';
