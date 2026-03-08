@@ -62,7 +62,7 @@ export async function POST(
     content: parsed.data.content,
   });
 
-  await commentRepo.save(comment);
+  await commentRepo.save(comment, { reload: false });
 
   return NextResponse.json({ ok: true, comment: comment }, { status: 201 });
 }
