@@ -62,7 +62,16 @@ export async function POST(
     content: parsed.data.content,
   });
 
-  await commentRepo.save(comment, { reload: false });
+  await commentRepo
+    .createQueryBuilder()
+    .insert()
+    .into(Comment)
+    .values({
+      postId,
+      userId: me.id,
+      content: parsed.data.content,
+    })
+    .execute();
 
   return NextResponse.json({ ok: true, comment: comment }, { status: 201 });
 }
