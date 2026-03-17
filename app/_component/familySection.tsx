@@ -1,9 +1,9 @@
-'use client';
-import React from 'react';
-import Image from 'next/image';
-import useFamilyDataStore from '../store/family-data';
-import banner3Image from '../../public/images/Frame 8.png';
-import { useRouter } from 'next/navigation';
+"use client";
+import React from "react";
+import Image from "next/image";
+import useFamilyDataStore from "../store/family-data";
+import banner3Image from "../../public/images/Frame 8.png";
+import { useRouter } from "next/navigation";
 
 export default function FamilySection() {
   const { familiesData, fetchFamilyData } = useFamilyDataStore();
@@ -20,8 +20,9 @@ export default function FamilySection() {
           أقسام القبيلة وفروعها
         </h2>
         <p className="text-base md:text-lg lg:text-3xl leading-relaxed text-gray-200 max-w-4xl mx-auto">
-          هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم بالكرم
-          والشجاعة ونبل الأخلاق
+          تنقسم إلى اربع قبائل رئيسية يجمعها النسب والولاء المتين وهم ال فايع بن
+          رشيد بن عبد وال محمد بن رشيد بن عبد و ال برقع بن غانم بن عبد و ال لحاف
+          بن غانم بن عبد
         </p>
       </div>
 
@@ -40,24 +41,24 @@ export default function FamilySection() {
                 <Image
                   className="object-cover"
                   src={banner3Image}
-                  alt={family.familyName || 'اسم العائلة'}
+                  alt={family.familyName || "اسم العائلة"}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div
                   className={`absolute inset-0 ${
                     index % 2 === 0
-                      ? 'bg-[#B1771F]/50'
-                      : 'bg-linear-to-t from-black/80 via-black/40 to-transparent'
+                      ? "bg-[#B1771F]/50"
+                      : "bg-linear-to-t from-black/80 via-black/40 to-transparent"
                   }`}
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
                   <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
-                    {family.familyName?.split(' ')[0] || 'اسم العائلة'}
+                    {family.familyName?.split(" ")[0] || "اسم العائلة"}
                   </h3>
                   <p className="text-base md:text-lg text-gray-200">
-                    {family.familyName?.split(' ').slice(1).join(' ') ||
-                      'ابن العبد'}
+                    {family.familyName?.split(" ").slice(1).join(" ") ||
+                      "ابن العبد"}
                   </p>
                 </div>
               </div>
