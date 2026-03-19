@@ -450,7 +450,7 @@ export default function FamilyInfo() {
                 className="text-amber-400/70 text-sm tracking-widest uppercase mb-1"
                 style={{ fontFamily: "'Scheherazade New', serif", letterSpacing: "0.3em" }}
               >
-                ✦ عائلة ✦
+                ✦ قبيلة ✦
               </p>
               <h1
                 className="text-4xl sm:text-5xl font-bold text-amber-300 drop-shadow-2xl"
@@ -478,7 +478,7 @@ export default function FamilyInfo() {
                     className="text-2xl font-bold text-amber-300 leading-none"
                     style={{ fontFamily: "'Scheherazade New', 'Amiri', serif" }}
                   >
-                    معلومات العائلة
+                    معلومات القبيلة
                   </h2>
                   <p className="text-stone-400 text-xs mt-0.5">نسب وتاريخ</p>
                 </div>

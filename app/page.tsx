@@ -1,7 +1,7 @@
-import Image from 'next/image';
-import bannerImage from '../public/images/Frame.png';
-import banner2Image from '../public/images/Frame 12.png';
- import FamilySection from './_component/familySection';
+import Image from "next/image";
+import bannerImage from "../public/images/Frame.png";
+import banner2Image from "../public/images/Frame 12.png";
+import FamilySection from "./_component/familySection";
 
 export default async function Home() {
   return (
@@ -29,7 +29,7 @@ export default async function Home() {
               هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم
               بالكرم والشجاعة ونبل الأخلاق، وتمسكت بالعادات العربية الأصيلة
               قولًا وفعلًا، فكان لها حضورها المميز ومكانتها المرموقة بين قبائل
-              قحطان وسائر القبائل، فكان لها حضورها المميز ومكانتها المرموقة.
+              قحطان وسائر القبائل
             </p>
           </div>
 
