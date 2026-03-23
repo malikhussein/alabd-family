@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { getDb } from '../../../../lib/db';
 import { Banner } from '../../../../entities/banner.entity';
 import { requireSession, isAdmin } from '../../../../lib/helpers/auth.helper';
-import { uploadImageToS3 } from '../../../../lib/upload-image';
+import {
+  deleteImageFromS3,
+  uploadImageToS3,
+} from '../../../../lib/upload-image';
 
 export async function GET(
   _req: Request,
@@ -109,6 +112,10 @@ export async function PATCH(
         userKey,
       });
 
+      if (banner.imageKey && banner.imageKey !== uploaded.key) {
+        await deleteImageFromS3(banner.imageKey);
+      }
+
       banner.imageKey = uploaded.key;
       banner.imageUrl = uploaded.publicUrl;
     }
@@ -162,6 +169,11 @@ export async function DELETE(
         { message: 'Banner not found' },
         { status: 404 },
       );
+    }
+
+    // Delete image from S3 if exists
+    if (banner.imageKey) {
+      await deleteImageFromS3(banner.imageKey);
     }
 
     await bannerRepo.softRemove(banner);

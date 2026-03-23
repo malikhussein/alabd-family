@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { requireSession } from '../../../../../lib/helpers/auth.helper';
-import { uploadImageToS3 } from '../../../../../lib/upload-image';
+import {
+  deleteImageFromS3,
+  uploadImageToS3,
+} from '../../../../../lib/upload-image';
 import { getDb } from '../../../../../lib/db';
 import { User } from '../../../../../entities/user.entity';
 
@@ -19,12 +22,6 @@ export async function POST(req: Request) {
 
   const userKey = session.user.id ?? session.user.email ?? 'user';
 
-  const { key, publicUrl } = await uploadImageToS3({
-    file,
-    kind: 'avatar',
-    userKey,
-  });
-
   const db = await getDb();
   const userRepo = db.getRepository(User);
 
@@ -32,6 +29,16 @@ export async function POST(req: Request) {
 
   if (!user) {
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
+  }
+
+  const { key, publicUrl } = await uploadImageToS3({
+    file,
+    kind: 'avatar',
+    userKey,
+  });
+
+  if (user.profileImageKey && user.profileImageKey !== key) {
+    await deleteImageFromS3(user.profileImageKey);
   }
 
   user.profileImageKey = key;

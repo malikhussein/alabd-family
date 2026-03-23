@@ -4,7 +4,10 @@ import { getDb } from '../../../../lib/db';
 import { isAdmin, requireSession } from '../../../../lib/helpers/auth.helper';
 import { Like } from '../../../../entities/like.entity';
 import { User } from '../../../../entities/user.entity';
-import { uploadImageToS3 } from '../../../../lib/upload-image';
+import {
+  uploadImageToS3,
+  deleteImageFromS3,
+} from '../../../../lib/upload-image';
 
 export async function GET(
   _req: Request,
@@ -151,6 +154,10 @@ export async function PATCH(
       userKey,
     });
 
+    if (post.imageKey && post.imageKey !== uploaded.key) {
+      await deleteImageFromS3(post.imageKey);
+    }
+
     post.imageKey = uploaded.key;
     post.imageUrl = uploaded.publicUrl;
   }
@@ -200,6 +207,11 @@ export async function DELETE(
       { message: 'Cannot delete approved post' },
       { status: 403 },
     );
+  }
+
+  // Delete image from S3 if exists
+  if (post.imageKey) {
+    await deleteImageFromS3(post.imageKey);
   }
 
   await repo.softDelete({ id: postId });
