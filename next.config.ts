@@ -6,14 +6,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: '77.42.89.236',
-        port: '9000',
-        pathname: '/alabd/**',
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '**',
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        hostname: 'pub-4ce47cb45f514d68a7bca7e1ad862db3.r2.dev',
         pathname: '**',
       },
     ],
