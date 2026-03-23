@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { s3 } from '@/lib/s3';
 
 const MAX_MB = 5;
@@ -80,4 +80,24 @@ export async function uploadImageToS3(params: {
 
   const publicUrl = `${base.replace(/\/$/, '')}/${key}`;
   return { key, publicUrl, contentType: file.type, size: file.size };
+}
+
+/**
+ * Deletes an image from MinIO/S3 using its S3 key.
+ * @param key - The S3 key of the object to delete (e.g., "avatars/user-id/abc123.jpg")
+ */
+export async function deleteImageFromS3(key: string) {
+  const bucket = process.env.S3_BUCKET;
+
+  if (!bucket) throw new Error('Missing S3_BUCKET env');
+  if (!key || key.trim() === '') throw new Error('S3 key is required');
+
+  await s3.send(
+    new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    }),
+  );
+
+  return { success: true, key };
 }
