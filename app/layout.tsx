@@ -24,14 +24,14 @@ const geistMono = Geist_Mono({
 export const metadata = {
   metadataBase: new URL('https://alalabd.com'),
   title: {
-    default: 'شبكة العابد',
-    template: '%s | شبكة العابد',
+    default: 'شبكة آل العبد',
+    template: '%s | شبكة آل العبد',
   },
-  description: 'منصة عربية للمحتوى والمنشورات.',
+  description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
   openGraph: {
-    siteName: 'شبكة العابد',
-    title: 'شبكة العابد',
-    description: 'منصة عربية للمحتوى والمنشورات.',
+    siteName: 'شبكة آل العبد',
+    title: 'شبكة آل العبد',
+    description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
     url: 'https://alalabd.com',
     locale: 'ar_EG',
     type: 'website',
