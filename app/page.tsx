@@ -4,7 +4,7 @@ import banner2Image from '../public/images/Frame 12.png';
 import FamilySection from './_component/familySection';
 
 const SITE_NAME = 'قبيلة آل العبد';
-const SITE_URL = 'https://alalabd.com/';
+const SITE_URL = 'https://alalabd.com';
 
 export default async function Home() {
   const websiteJsonLd = {
