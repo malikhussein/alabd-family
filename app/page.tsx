@@ -2,37 +2,42 @@ import Image from 'next/image';
 import bannerImage from '../public/images/Frame.png';
 import banner2Image from '../public/images/Frame 12.png';
 import FamilySection from './_component/familySection';
-import Script from 'next/script';
+
+const SITE_NAME = 'قبيلة آل العبد';
+const SITE_URL = 'https://alalabd.com/';
 
 export default async function Home() {
   const websiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'شبكة آل العبد',
-    alternateName: ['آل العبد', 'Alalabd'],
-    url: 'https://alalabd.com',
+    name: SITE_NAME,
+    alternateName: ['آل العبد', 'قبيلة ال العبد', 'Alalabd'],
+    url: SITE_URL,
   };
 
-  const orgJsonLd = {
+  const organizationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'شبكة آل العبد',
-    url: 'https://alalabd.com',
-    logo: 'https://alalabd.com/api/logo',
+    name: SITE_NAME,
+    alternateName: ['آل العبد', 'قبيلة ال العبد', 'Alalabd'],
+    url: SITE_URL,
+    logo: 'https://alalabd.com/logo.png',
   };
 
   return (
     <>
-      <Script
-        id='website-jsonld'
+      <script
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteJsonLd),
+        }}
       />
 
-      <Script
-        id='org-jsonld'
+      <script
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd),
+        }}
       />
 
       <div className='min-h-screen'>

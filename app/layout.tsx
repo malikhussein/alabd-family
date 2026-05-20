@@ -1,12 +1,7 @@
-import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Amiri } from 'next/font/google';
 import './globals.css';
 import NavBar from './_component/navBar';
 import Providers from './providers';
-
-const SITE_URL = 'https://alalabd.com';
-const SITE_NAME = 'قبيلة آل العبد';
-const SITE_DESCRIPTION = 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان';
 
 const amiri = Amiri({
   subsets: ['arabic', 'latin'],
@@ -25,47 +20,25 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-
-  applicationName: SITE_NAME,
-
+export const metadata = {
+  metadataBase: new URL('https://alalabd.com'),
   title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    default: 'قبيلة آل العبد',
+    template: '%s | قبيلة آل العبد',
   },
-
-  description: SITE_DESCRIPTION,
-
+  description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
+  applicationName: 'قبيلة آل العبد',
   alternates: {
-    canonical: '/',
+    canonical: 'https://alalabd.com/',
   },
-
   openGraph: {
     type: 'website',
     locale: 'ar_SA',
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: SITE_NAME,
-    description: SITE_DESCRIPTION,
+    url: 'https://alalabd.com/',
+    siteName: 'قبيلة آل العبد',
+    title: 'قبيلة آل العبد',
+    description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
   },
-
-  robots: {
-    index: true,
-    follow: true,
-  },
-
-  icons: {
-    icon: '/favicon.ico',
-  },
-};
-
-const websiteJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: SITE_NAME,
-  alternateName: ['شبكة ال العبد', 'آل العبد', 'قبيلة آل العبد'],
-  url: `${SITE_URL}/`,
 };
 
 export default function RootLayout({
@@ -78,13 +51,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-card min-h-screen`}
       >
-        <script
-          type='application/ld+json'
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteJsonLd).replace(/</g, '\\u003c'),
-          }}
-        />
-
         <Providers>
           <NavBar />
           {children}

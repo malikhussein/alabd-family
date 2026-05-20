@@ -32,7 +32,9 @@ function getSegmentLabel(
     return 'تأكيد إعادة التعيين';
   }
 
-  return segmentLabelMap[segment] ?? decodeURIComponent(segment).replace(/-/g, ' ');
+  return (
+    segmentLabelMap[segment] ?? decodeURIComponent(segment).replace(/-/g, ' ')
+  );
 }
 
 export default function BreadcrumbJsonLd() {
@@ -48,7 +50,7 @@ export default function BreadcrumbJsonLd() {
     {
       '@type': 'ListItem',
       position: 1,
-      name: 'شبكة آل العبد',
+      name: 'قبيلة آل العبد',
       item: `${BASE_URL}/`,
     },
   ];
@@ -71,9 +73,9 @@ export default function BreadcrumbJsonLd() {
     itemListElement,
   };
 
-  const scriptId = `breadcrumb-jsonld-${pathname
-    .replace(/^\//, '')
-    .replace(/[^a-zA-Z0-9-]/g, '-') || 'home'}`;
+  const scriptId = `breadcrumb-jsonld-${
+    pathname.replace(/^\//, '').replace(/[^a-zA-Z0-9-]/g, '-') || 'home'
+  }`;
 
   return (
     <Script
