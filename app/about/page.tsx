@@ -2,37 +2,75 @@ import Image from "next/image";
 import React from "react";
 import hzImage from "../../public/images/hz.png";
 
+export const metadata = {
+  title: 'من نحن',
+  description: 'تعرف على قبيلة آل العبد الحباب وتاريخها العريق وقيمها الأصيلة منذ القدم',
+  keywords: ['من نحن', 'عن القبيلة', 'تاريخ قبيلة آل العبد', 'قبائل الحباب', 'قبائل قحطان'],
+  openGraph: {
+    title: 'من نحن | قبيلة آل العبد',
+    description: 'تعرف على قبيلة آل العبد الحباب وتاريخها العريق وقيمها الأصيلة منذ القدم',
+    url: 'https://alalabd.com/about',
+    type: 'website',
+  },
+};
+
 export default function Page() {
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'قبيلة آل العبد',
+        item: 'https://alalabd.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'من نحن',
+        item: 'https://alalabd.com/about',
+      },
+    ],
+  };
+
   return (
-    <div className="container mx-auto px-4 py-12 md:py-20 ">
-      {/* Banner -   */}
-      <div className="w-full ">
-        <div className="relative h-64 md:h-72 lg:h-120 ">
-          <Image
-            className="object-cover"
-            src={hzImage}
-            alt="يحيى ابن راشد ابن العبد"
-            fill
-          />
-          <div className="absolute inset-0  bg-[#B1771F]/50" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 text-center mb-40">
-            <h3 className="text-xl md:text-2xl lg:text-4xl font-bold text-white  ">
-              مــــن
-            </h3>
-            <h3 className="text-xl md:text-2xl lg:text-4xl font-bold text-white mt-4">
-              نحـــــــــــــن
-            </h3>
+    <>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
+      <div className="container mx-auto px-4 py-12 md:py-20">
+        {/* Banner -   */}
+        <div className="w-full ">
+          <div className="relative h-64 md:h-72 lg:h-120 ">
+            <Image
+              className="object-cover"
+              src={hzImage}
+              alt="يحيى ابن راشد ابن العبد"
+              fill
+            />
+            <div className="absolute inset-0  bg-[#B1771F]/50" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-center mb-40">
+              <h3 className="text-xl md:text-2xl lg:text-4xl font-bold text-white  ">
+                مــــن
+              </h3>
+              <h3 className="text-xl md:text-2xl lg:text-4xl font-bold text-white mt-4">
+                نحـــــــــــــن
+              </h3>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="mt-12 space-y-6">
-        <h3 className="text-xl md:text-2xl lg:text-5xl font-bold text-primary text-right">
-          قبيلة آل العبد الحباب
-        </h3>
-        <p className=" text-lg md:text-xl lg:text-2xl text-white text-right  leading-7 sm:leading-8 md:leading-9 lg:leading-10 xl:leading-12  whitespace-pre-wrap">
-          {`
+        {/* Content */}
+        <div className="mt-12 space-y-6">
+          <h3 className="text-xl md:text-2xl lg:text-5xl font-bold text-primary text-right">
+            قبيلة آل العبد الحباب
+          </h3>
+          <p className=" text-lg md:text-xl lg:text-2xl text-white text-right  leading-7 sm:leading-8 md:leading-9 lg:leading-10 xl:leading-12  whitespace-pre-wrap">
+            {`
 قبيلة آل العبد هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم بالكرم والشجاعة ونبل الأخلاق، وتمسكت بالعادات العربية الأصيلة قولًا وفعلًا فكان لها حضورها المميز ومكانتها المرموقة بين قبائل قحطان وسائر القبائل
 
  ينتمي أبناء آل العبد إلى أصل عربي صريح، وقد اشتهروا بحسن الجوار، وإغاثة الملهوف، والوفاء بالعهود، إضافة إلى بأسهم في المواقف الصعبة وهو ما جعل اسمهم حاضرًا في ميادين الشرف والذكر الطيب
@@ -44,8 +82,9 @@ export default function Page() {
 وقد عُرف عن قبيلة آل العبد علاقتهم الطيبة وتاريخهم المشرّف مع حكام الخليج، القائم على الولاء والصدق وحسن السيرة، مما عزز مكانتهم ورسخ احترامهم في مختلف المحافل
 
 ولا يزال أبناء قبيلة آل العبد إلى اليوم محافظين على إرثهم القبلي وتاريخهم المجيد، حاملين قيم آبائهم وأجدادهم، ومواصلين العطاء في خدمة دينهم ووطنهم ومجتمعهم`}
-        </p>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

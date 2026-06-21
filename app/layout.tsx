@@ -28,6 +28,19 @@ export const metadata = {
   },
   description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
   applicationName: 'قبيلة آل العبد',
+  keywords: ['قبيلة آل العبد', 'قبيلة ال العبد', 'آل العبد', 'Alalabd', 'قبائل قحطان', 'قبائل الحباب', 'العرب الأصيلة'],
+  authors: [{ name: 'قبيلة آل العبد' }],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   alternates: {
     canonical: 'https://alalabd.com/',
   },
@@ -38,6 +51,24 @@ export const metadata = {
     siteName: 'قبيلة آل العبد',
     title: 'قبيلة آل العبد',
     description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
+    images: [
+      {
+        url: 'https://alalabd.com/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'قبيلة آل العبد',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'قبيلة آل العبد',
+    description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان',
+    images: ['https://alalabd.com/logo.png'],
+    creator: '@alalabd',
+  },
+  verification: {
+    google: 'your-google-verification-code',
   },
 };
 

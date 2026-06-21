@@ -5,14 +5,48 @@ import SideBar from "../_component/sideBar";
 import Image from "next/image";
 import usePostStore from "../store/post";
 import useUserStore from "../store/user";
- 
+
+export const metadata = {
+  title: 'مجتمع القبيلة',
+  description: 'تابع أحدث الأخبار والمقالات والفعاليات في مجتمع قبيلة آل العبد',
+  keywords: ['مجتمع القبيلة', 'أخبار القبيلة', 'مقالات', 'فعاليات', 'قبيلة آل العبد'],
+  openGraph: {
+    title: 'مجتمع القبيلة | قبيلة آل العبد',
+    description: 'تابع أحدث الأخبار والمقالات والفعاليات في مجتمع قبيلة آل العبد',
+    url: 'https://alalabd.com/posts',
+    type: 'website',
+  },
+};
+
  export default function Posts() {
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'قبيلة آل العبد',
+        item: 'https://alalabd.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'مجتمع القبيلة',
+        item: 'https://alalabd.com/posts',
+      },
+    ],
+  };
 
-
-
-  return (
-    <>
-      <div className="container mx-auto px-4 py-12 md:py-20 ">
+   return (
+     <>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
+       <div className="container mx-auto px-4 py-12 md:py-20 ">
         {/* Banner -   */}
         <div className="w-full ">
           <div className="relative h-64 md:h-72 lg:h-120 ">

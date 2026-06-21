@@ -3,7 +3,38 @@ import hzImage from "../../public/images/hz.png";
 import cardImage from "../../public/images/Container.png";
 import Image from "next/image";
 
+export const metadata = {
+  title: 'القاب وعزاوي',
+  description: 'تعرف على الألقاب والعزاوي الشهيرة في قبيلة آل العبد',
+  keywords: ['القاب', 'عزاوي', 'ألقاب القبيلة', 'عزاوي القبيلة', 'قبيلة آل العبد'],
+  openGraph: {
+    title: 'القاب وعزاوي | قبيلة آل العبد',
+    description: 'تعرف على الألقاب والعزاوي الشهيرة في قبيلة آل العبد',
+    url: 'https://alalabd.com/called',
+    type: 'website',
+  },
+};
+
 export default function page() {
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'قبيلة آل العبد',
+        item: 'https://alalabd.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'القاب وعزاوي',
+        item: 'https://alalabd.com/called',
+      },
+    ],
+  };
+
   const cards = [
     { title: "شاعت شوايع ال العبد" },
     { title: "ابن عباد اني ولد عباد" },
@@ -17,10 +48,17 @@ export default function page() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a0a] overflow-x-hidden" dir="rtl">
+    <>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
+      <div className="min-h-screen w-full bg-[#0a0a0a] overflow-x-hidden" dir="rtl">
 
       {/* Banner */}
-      
+
       <div className="relative w-full flex flex-col items-center justify-center px-4 py-10 sm:py-16 md:py-20 overflow-hidden">
 
         {/* Background decorative image */}
@@ -90,7 +128,7 @@ export default function page() {
           ))}
         </div>
       </div>
-
-    </div>
+      </div>
+    </>
   );
 }

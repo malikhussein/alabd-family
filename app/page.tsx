@@ -22,6 +22,25 @@ export default async function Home() {
     alternateName: ['آل العبد', 'قبيلة ال العبد', 'Alalabd'],
     url: SITE_URL,
     logo: 'https://alalabd.com/logo.png',
+    description: 'قبيلة آل العبد هي إحدى قبائل الحباب من قحطان، وهي قبيلة عريقة عُرفت منذ القدم بالكرم والشجاعة ونبل الأخلاق',
+    sameAs: [],
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'SA',
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: SITE_NAME,
+        item: SITE_URL,
+      },
+    ],
   };
 
   return (
@@ -37,6 +56,13 @@ export default async function Home() {
         type='application/ld+json'
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(organizationJsonLd),
+        }}
+      />
+
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
         }}
       />
 

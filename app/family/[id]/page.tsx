@@ -409,6 +409,32 @@ export default function FamilyInfo() {
 
   return (
     <>
+      {/* Breadcrumb Structured Data */}
+      {familyData && (
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'قبيلة آل العبد',
+                  item: 'https://alalabd.com/',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: familyData.familyName,
+                  item: `https://alalabd.com/family/${id}`,
+                },
+              ],
+            }),
+          }}
+        />
+      )}
       {/* Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
