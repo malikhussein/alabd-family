@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { FamilyData } from '../../../entities/family-data.entity';
 import { getDb } from '../../../lib/db';
 
 interface Params {
@@ -14,11 +13,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const db = await getDb();
-  const familyDataRepo = db.getRepository(FamilyData);
-  
-  const familyData = await familyDataRepo.findOne({
-    where: { id: Number(id) },
-  });
+  const [familyData] = await db.query(
+    'SELECT family_name AS "familyName", family_info AS "familyInfo" FROM family_data WHERE id = $1 LIMIT 1',
+    [Number(id)],
+  );
 
   if (!familyData) {
     return {
@@ -28,11 +26,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${familyData.familyName}`,
-    description: familyData.familyInfo?.substring(0, 160) || `معلومات عن عائلة ${familyData.familyName} في قبيلة آل العبد`,
+    description:
+      familyData.familyInfo?.substring(0, 160) ||
+      `معلومات عن عائلة ${familyData.familyName} في قبيلة آل العبد`,
     keywords: [familyData.familyName, 'قبيلة آل العبد', 'عائلة', 'نسب'],
     openGraph: {
       title: `${familyData.familyName} | قبيلة آل العبد`,
-      description: familyData.familyInfo?.substring(0, 160) || `معلومات عن عائلة ${familyData.familyName} في قبيلة آل العبد`,
+      description:
+        familyData.familyInfo?.substring(0, 160) ||
+        `معلومات عن عائلة ${familyData.familyName} في قبيلة آل العبد`,
       url: `https://alalabd.com/family/${id}`,
       type: 'website',
     },
@@ -42,6 +44,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function FamilyLayout({ children }: { children: React.ReactNode }) {
+export default function FamilyLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return children;
 }
